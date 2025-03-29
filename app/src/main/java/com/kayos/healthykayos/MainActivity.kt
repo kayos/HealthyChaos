@@ -21,7 +21,6 @@ import com.polar.sdk.api.errors.PolarInvalidArgument
 import com.polar.sdk.api.model.LedConfig
 import com.polar.sdk.api.model.PolarAccelerometerData
 import com.polar.sdk.api.model.PolarDeviceInfo
-import com.polar.sdk.api.model.PolarEcgData
 import com.polar.sdk.api.model.PolarExerciseData
 import com.polar.sdk.api.model.PolarExerciseEntry
 import com.polar.sdk.api.model.PolarGyroData
@@ -71,7 +70,6 @@ class MainActivity : AppCompatActivity() {
     private var scanDisposable: Disposable? = null
     private var autoConnectDisposable: Disposable? = null
     private var hrDisposable: Disposable? = null
-    private var ecgDisposable: Disposable? = null
     private var accDisposable: Disposable? = null
     private var gyrDisposable: Disposable? = null
     private var magDisposable: Disposable? = null
@@ -94,7 +92,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var autoConnectButton: Button
     private lateinit var scanButton: Button
     private lateinit var hrButton: Button
-    private lateinit var ecgButton: Button
     private lateinit var accButton: Button
     private lateinit var gyrButton: Button
     private lateinit var magButton: Button
@@ -129,7 +126,6 @@ class MainActivity : AppCompatActivity() {
         autoConnectButton = findViewById(R.id.auto_connect_button)
         scanButton = findViewById(R.id.scan_button)
         hrButton = findViewById(R.id.hr_button)
-        ecgButton = findViewById(R.id.ecg_button)
         accButton = findViewById(R.id.acc_button)
         gyrButton = findViewById(R.id.gyr_button)
         magButton = findViewById(R.id.mag_button)
@@ -317,33 +313,6 @@ class MainActivity : AppCompatActivity() {
                 toggleButtonUp(hrButton, R.string.start_hr_stream)
                 // NOTE dispose will stop streaming if it is "running"
                 hrDisposable?.dispose()
-            }
-        }
-
-        ecgButton.setOnClickListener {
-            val isDisposed = ecgDisposable?.isDisposed ?: true
-            if (isDisposed) {
-                toggleButtonDown(ecgButton, R.string.stop_ecg_stream)
-                ecgDisposable = requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.ECG)
-                    .flatMap { settings: PolarSensorSetting ->
-                        api.startEcgStreaming(deviceId, settings)
-                    }
-                    .subscribe(
-                        { polarEcgData: PolarEcgData ->
-                            for (data in polarEcgData.samples) {
-                                Log.d(TAG, "    yV:  timeStamp: ${data.timeStamp}")
-                            }
-                        },
-                        { error: Throwable ->
-                            toggleButtonUp(ecgButton, R.string.start_ecg_stream)
-                            Log.e(TAG, "ECG stream failed. Reason $error")
-                        },
-                        { Log.d(TAG, "ECG stream complete") }
-                    )
-            } else {
-                toggleButtonUp(ecgButton, R.string.start_ecg_stream)
-                // NOTE stops streaming if it is "running"
-                ecgDisposable?.dispose()
             }
         }
 
@@ -977,7 +946,6 @@ class MainActivity : AppCompatActivity() {
         connectButton.isEnabled = false
         autoConnectButton.isEnabled = false
         scanButton.isEnabled = false
-        ecgButton.isEnabled = false
         accButton.isEnabled = false
         gyrButton.isEnabled = false
         magButton.isEnabled = false
@@ -1003,7 +971,6 @@ class MainActivity : AppCompatActivity() {
         connectButton.isEnabled = true
         autoConnectButton.isEnabled = true
         scanButton.isEnabled = true
-        ecgButton.isEnabled = true
         accButton.isEnabled = true
         gyrButton.isEnabled = true
         magButton.isEnabled = true
@@ -1025,7 +992,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun disposeAllStreams() {
-        ecgDisposable?.dispose()
         accDisposable?.dispose()
         gyrDisposable?.dispose()
         magDisposable?.dispose()
