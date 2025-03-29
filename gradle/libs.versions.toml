@@ -19,6 +19,9 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+polar-ble-sdk = { module = "com.github.polarofficial:polar-ble-sdk" }
+rxandroid = { module = "io.reactivex.rxjava3:rxandroid" }
+rxjava = { module = "io.reactivex.rxjava3:rxjava" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
