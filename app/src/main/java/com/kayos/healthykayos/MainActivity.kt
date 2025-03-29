@@ -12,13 +12,11 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.util.Pair
 import com.google.android.material.snackbar.Snackbar
 import com.polar.androidcommunications.api.ble.model.DisInfo
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiCallback
 import com.polar.sdk.api.PolarBleApiDefaultImpl
-import com.polar.sdk.api.PolarH10OfflineExerciseApi
 import com.polar.sdk.api.errors.PolarInvalidArgument
 import com.polar.sdk.api.model.LedConfig
 import com.polar.sdk.api.model.PolarAccelerometerData
@@ -61,7 +59,6 @@ class MainActivity : AppCompatActivity() {
                 PolarBleApi.PolarBleSdkFeature.FEATURE_HR,
                 PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_SDK_MODE,
                 PolarBleApi.PolarBleSdkFeature.FEATURE_BATTERY_INFO,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_H10_EXERCISE_RECORDING,
                 PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_OFFLINE_RECORDING,
                 PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_ONLINE_STREAMING,
                 PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_DEVICE_TIME_SETUP,
@@ -106,9 +103,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var listExercisesButton: Button
     private lateinit var fetchExerciseButton: Button
     private lateinit var removeExerciseButton: Button
-    private lateinit var startH10RecordingButton: Button
-    private lateinit var stopH10RecordingButton: Button
-    private lateinit var readH10RecordingStatusButton: Button
     private lateinit var setTimeButton: Button
     private lateinit var getTimeButton: Button
     private lateinit var toggleSdkModeButton: Button
@@ -144,9 +138,6 @@ class MainActivity : AppCompatActivity() {
         listExercisesButton = findViewById(R.id.list_exercises)
         fetchExerciseButton = findViewById(R.id.read_exercise)
         removeExerciseButton = findViewById(R.id.remove_exercise)
-        startH10RecordingButton = findViewById(R.id.start_h10_recording)
-        stopH10RecordingButton = findViewById(R.id.stop_h10_recording)
-        readH10RecordingStatusButton = findViewById(R.id.h10_recording_status)
         setTimeButton = findViewById(R.id.set_time)
         getTimeButton = findViewById(R.id.get_time)
         toggleSdkModeButton = findViewById(R.id.toggle_SDK_mode)
@@ -594,93 +585,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        startH10RecordingButton.setOnClickListener {
-            val isDisposed = recordingStartStopDisposable?.isDisposed ?: true
-            if (isDisposed) {
-                val recordIdentifier = "TEST_APP_ID"
-                recordingStartStopDisposable = api.startRecording(deviceId, recordIdentifier, PolarH10OfflineExerciseApi.RecordingInterval.INTERVAL_1S, PolarH10OfflineExerciseApi.SampleType.HR)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        {
-                            val recordingStartOk = "Recording started with id $recordIdentifier"
-                            Log.d(TAG, recordingStartOk)
-                            showSnackbar(recordingStartOk)
-                        },
-                        { error: Throwable ->
-                            val title = "Recording start failed with id $recordIdentifier"
-                            val message = "Possible reasons are, the recording is already started on the device or there is exercise recorded on H10. " +
-                                    "H10 can have one recording in the memory at the time.\n\n" +
-                                    "Detailed Reason: $error"
-                            Log.e(TAG, "Recording start failed with id $recordIdentifier. Reason: $error")
-                            showDialog(title, message)
-                        }
-                    )
-            } else {
-                Log.d(TAG, "Recording start or stop request is already in progress at the moment.")
-            }
-        }
-
-        stopH10RecordingButton.setOnClickListener {
-            val isDisposed = recordingStartStopDisposable?.isDisposed ?: true
-            if (isDisposed) {
-                recordingStartStopDisposable = api.stopRecording(deviceId)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        {
-                            val recordingStopOk = "Recording stopped"
-                            Log.d(TAG, recordingStopOk)
-                            showSnackbar(recordingStopOk)
-                        },
-                        { error: Throwable ->
-                            val recordingStopError = "Recording stop failed. Reason: $error"
-                            Log.e(TAG, recordingStopError)
-                            showSnackbar(recordingStopError)
-                        }
-                    )
-            } else {
-                Log.d(TAG, "Recording start or stop request is already in progress at the moment.")
-            }
-        }
-
-        readH10RecordingStatusButton.setOnClickListener {
-            val isDisposed = recordingStatusReadDisposable?.isDisposed ?: true
-            if (isDisposed) {
-                recordingStatusReadDisposable = api.requestRecordingStatus(deviceId)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { pair: Pair<Boolean, String> ->
-                            val recordingOn = pair.first
-                            val recordingId = pair.second
-
-                            val recordingStatus = if (!recordingOn && recordingId.isEmpty()) {
-                                "H10 Recording is OFF"
-                            } else if (!recordingOn && recordingId.isNotEmpty()) {
-                                "H10 Recording is OFF.\n\n" +
-                                        "Exercise id $recordingId is currently found on H10 memory"
-                            } else if (recordingOn && recordingId.isNotEmpty()) {
-                                "H10 Recording is ON.\n\n" +
-                                        "Exercise id $recordingId recording ongoing"
-                            } else if (recordingOn && recordingId.isEmpty()) {
-                                // This state is undefined. If recording is currently ongoing the H10 must return id of the recording
-                                "H10 Recording state UNDEFINED"
-                            } else {
-                                // This state is unreachable and should never happen
-                                "H10 recording state ERROR"
-                            }
-                            Log.d(TAG, recordingStatus)
-                            showDialog("Recording status", recordingStatus)
-                        },
-                        { error: Throwable ->
-                            val recordingStatusReadError = "Recording status read failed. Reason: $error"
-                            Log.e(TAG, recordingStatusReadError)
-                            showSnackbar(recordingStatusReadError)
-                        }
-                    )
-            } else {
-                Log.d(TAG, "Recording status request is already in progress at the moment.")
-            }
-        }
-
         setTimeButton.setOnClickListener {
             val calendar = Calendar.getInstance()
             calendar.time = Date()
@@ -1082,9 +986,6 @@ class MainActivity : AppCompatActivity() {
         listExercisesButton.isEnabled = false
         fetchExerciseButton.isEnabled = false
         removeExerciseButton.isEnabled = false
-        startH10RecordingButton.isEnabled = false
-        stopH10RecordingButton.isEnabled = false
-        readH10RecordingStatusButton.isEnabled = false
         setTimeButton.isEnabled = false
         getTimeButton.isEnabled = false
         toggleSdkModeButton.isEnabled = false
@@ -1111,9 +1012,6 @@ class MainActivity : AppCompatActivity() {
         listExercisesButton.isEnabled = true
         fetchExerciseButton.isEnabled = true
         removeExerciseButton.isEnabled = true
-        startH10RecordingButton.isEnabled = true
-        stopH10RecordingButton.isEnabled = true
-        readH10RecordingStatusButton.isEnabled = true
         setTimeButton.isEnabled = true
         getTimeButton.isEnabled = true
         toggleSdkModeButton.isEnabled = true

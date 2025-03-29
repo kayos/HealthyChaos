@@ -129,24 +129,6 @@
             android:text="@string/remove_exercise" />
 
         <Button
-            android:id="@+id/start_h10_recording"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/start_h10_recording" />
-
-        <Button
-            android:id="@+id/stop_h10_recording"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/stop_h10_recording" />
-
-        <Button
-            android:id="@+id/h10_recording_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/h10_recording_status" />
-
-        <Button
             android:id="@+id/set_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
