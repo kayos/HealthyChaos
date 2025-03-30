@@ -21,10 +21,6 @@
     <string name="auto_connect_toggle">Auto connect</string>
     <string name="scan_devices">scan devices</string>
     <string name="scanning_devices">stop device scan</string>
-    <string name="list_exercises">list exercises</string>
-    <string name="read_exercise">read exercise</string>
-    <string name="reading_exercise">reading exercise</string>
-    <string name="remove_exercise">remove exercise</string>
     <string name="sampling_rate">Sampling rate</string>
     <string name="resolution">Resolution</string>
     <string name="range">Range</string>

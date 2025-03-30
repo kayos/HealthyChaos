@@ -21,8 +21,6 @@ import com.polar.sdk.api.errors.PolarInvalidArgument
 import com.polar.sdk.api.model.LedConfig
 import com.polar.sdk.api.model.PolarAccelerometerData
 import com.polar.sdk.api.model.PolarDeviceInfo
-import com.polar.sdk.api.model.PolarExerciseData
-import com.polar.sdk.api.model.PolarExerciseEntry
 import com.polar.sdk.api.model.PolarGyroData
 import com.polar.sdk.api.model.PolarHealthThermometerData
 import com.polar.sdk.api.model.PolarHrBroadcastData
@@ -75,14 +73,10 @@ class MainActivity : AppCompatActivity() {
     private var ppgDisposable: Disposable? = null
     private var ppiDisposable: Disposable? = null
     private var sdkModeEnableDisposable: Disposable? = null
-    private var listExercisesDisposable: Disposable? = null
-    private var fetchExerciseDisposable: Disposable? = null
-    private var removeExerciseDisposable: Disposable? = null
 
     private var sdkModeEnabledStatus = false
     private var deviceConnected = false
     private var bluetoothEnabled = false
-    private var exerciseEntries: MutableList<PolarExerciseEntry> = mutableListOf()
 
     private lateinit var broadcastButton: Button
     private lateinit var connectButton: Button
@@ -94,9 +88,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var magButton: Button
     private lateinit var ppgButton: Button
     private lateinit var ppiButton: Button
-    private lateinit var listExercisesButton: Button
-    private lateinit var fetchExerciseButton: Button
-    private lateinit var removeExerciseButton: Button
     private lateinit var toggleSdkModeButton: Button
     private lateinit var changeSdkModeLedAnimationStatusButton: Button
     private lateinit var changePpiModeLedAnimationStatusButton: Button
@@ -124,9 +115,6 @@ class MainActivity : AppCompatActivity() {
         magButton = findViewById(R.id.mag_button)
         ppgButton = findViewById(R.id.ohr_ppg_button)
         ppiButton = findViewById(R.id.ohr_ppi_button)
-        listExercisesButton = findViewById(R.id.list_exercises)
-        fetchExerciseButton = findViewById(R.id.read_exercise)
-        removeExerciseButton = findViewById(R.id.remove_exercise)
         toggleSdkModeButton = findViewById(R.id.toggle_SDK_mode)
         changeSdkModeLedAnimationStatusButton = findViewById(R.id.change_sdk_mode_led_animation_status)
         changePpiModeLedAnimationStatusButton = findViewById(R.id.change_ppi_mode_led_animation_status)
@@ -446,100 +434,6 @@ class MainActivity : AppCompatActivity() {
                 toggleButtonUp(ppiButton, R.string.start_ppi_stream)
                 // NOTE dispose will stop streaming if it is "running"
                 ppiDisposable?.dispose()
-            }
-        }
-
-        listExercisesButton.setOnClickListener {
-            val isDisposed = listExercisesDisposable?.isDisposed ?: true
-            if (isDisposed) {
-                exerciseEntries.clear()
-                listExercisesDisposable = api.listExercises(deviceId)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { polarExerciseEntry: PolarExerciseEntry ->
-                            Log.d(TAG, "next: ${polarExerciseEntry.date} path: ${polarExerciseEntry.path} id: ${polarExerciseEntry.identifier}")
-                            exerciseEntries.add(polarExerciseEntry)
-                        },
-                        { error: Throwable ->
-                            val errorDescription = "Failed to list exercises. Reason: $error"
-                            Log.w(TAG, errorDescription)
-                            showSnackbar(errorDescription)
-                        },
-                        {
-                            val completedOk = "Exercise listing completed. Listed ${exerciseEntries.count()} exercises on device $deviceId."
-                            Log.d(TAG, completedOk)
-                            showSnackbar(completedOk)
-                        }
-                    )
-            } else {
-                Log.d(TAG, "Listing of exercise entries is in progress at the moment.")
-            }
-        }
-
-        fetchExerciseButton.setOnClickListener {
-            val isDisposed = fetchExerciseDisposable?.isDisposed ?: true
-            if (isDisposed) {
-                if (exerciseEntries.isNotEmpty()) {
-                    toggleButtonDown(fetchExerciseButton, R.string.reading_exercise)
-                    // just for the example purpose read the entry which is first on the exerciseEntries list
-                    fetchExerciseDisposable = api.fetchExercise(deviceId, exerciseEntries.first())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doFinally {
-                            toggleButtonUp(fetchExerciseButton, R.string.read_exercise)
-                        }
-                        .subscribe(
-                            { polarExerciseData: PolarExerciseData ->
-                                Log.d(TAG, "Exercise data count: ${polarExerciseData.hrSamples.size} samples: ${polarExerciseData.hrSamples}")
-                                var onComplete = "Exercise has ${polarExerciseData.hrSamples.size} hr samples.\n\n"
-                                if (polarExerciseData.hrSamples.size >= 3)
-                                    onComplete += "HR data {${polarExerciseData.hrSamples[0]}, ${polarExerciseData.hrSamples[1]}, ${polarExerciseData.hrSamples[2]} ...}"
-                                showDialog("Exercise data read", onComplete)
-                            },
-                            { error: Throwable ->
-                                val errorDescription = "Failed to read exercise. Reason: $error"
-                                Log.e(TAG, errorDescription)
-                                showSnackbar(errorDescription)
-                            }
-                        )
-                } else {
-                    val helpTitle = "Reading exercise is not possible"
-                    val helpMessage = "Either device has no exercise entries or you haven't list them yet. Please, create an exercise or use the \"LIST EXERCISES\" " +
-                            "button to list exercises on device."
-                    showDialog(helpTitle, helpMessage)
-                }
-            } else {
-                Log.d(TAG, "Reading of exercise is in progress at the moment.")
-            }
-        }
-
-        removeExerciseButton.setOnClickListener {
-            val isDisposed = removeExerciseDisposable?.isDisposed ?: true
-            if (isDisposed) {
-                if (exerciseEntries.isNotEmpty()) {
-                    // just for the example purpose remove the entry which is first on the exerciseEntries list
-                    val entry = exerciseEntries.first()
-                    removeExerciseDisposable = api.removeExercise(deviceId, entry)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                            {
-                                exerciseEntries.remove(entry)
-                                val exerciseRemovedOk = "Exercise with id:${entry.identifier} successfully removed"
-                                Log.d(TAG, exerciseRemovedOk)
-                                showSnackbar(exerciseRemovedOk)
-                            },
-                            { error: Throwable ->
-                                val exerciseRemoveFailed = "Exercise with id:${entry.identifier} remove failed: $error"
-                                Log.w(TAG, exerciseRemoveFailed)
-                                showSnackbar(exerciseRemoveFailed)
-                            }
-                        )
-                } else {
-                    val helpTitle = "Removing exercise is not possible"
-                    val helpMessage = "Either device has no exercise entries or you haven't list them yet. Please, create an exercise or use the \"LIST EXERCISES\" button to list exercises on device"
-                    showDialog(helpTitle, helpMessage)
-                }
-            } else {
-                Log.d(TAG, "Removing of exercise is in progress at the moment.")
             }
         }
 
@@ -886,9 +780,6 @@ class MainActivity : AppCompatActivity() {
         magButton.isEnabled = false
         ppgButton.isEnabled = false
         ppiButton.isEnabled = false
-        listExercisesButton.isEnabled = false
-        fetchExerciseButton.isEnabled = false
-        removeExerciseButton.isEnabled = false
         toggleSdkModeButton.isEnabled = false
         //Verity Sense recording buttons
         listRecordingsButton.isEnabled = false
@@ -908,9 +799,6 @@ class MainActivity : AppCompatActivity() {
         magButton.isEnabled = true
         ppgButton.isEnabled = true
         ppiButton.isEnabled = true
-        listExercisesButton.isEnabled = true
-        fetchExerciseButton.isEnabled = true
-        removeExerciseButton.isEnabled = true
         toggleSdkModeButton.isEnabled = true
         //Verity Sense recording buttons
         listRecordingsButton.isEnabled = true

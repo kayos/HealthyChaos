@@ -104,24 +104,6 @@
             android:layout_marginBottom="2dp"
             android:background="@android:color/white" />
 
-        <Button
-            android:id="@+id/list_exercises"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/list_exercises" />
-
-        <Button
-            android:id="@+id/read_exercise"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/read_exercise" />
-
-        <Button
-            android:id="@+id/remove_exercise"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/remove_exercise" />
-
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -172,5 +154,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/disable_ppi_mode_led_animation" />
+
     </LinearLayout>
 </ScrollView>
