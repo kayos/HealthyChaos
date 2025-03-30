@@ -104,7 +104,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var getDiskSpaceButton: Button
     private lateinit var changeSdkModeLedAnimationStatusButton: Button
     private lateinit var changePpiModeLedAnimationStatusButton: Button
-    private lateinit var doFactoryResetButton: Button
 
     //Verity Sense offline recording use
     private lateinit var listRecordingsButton: Button
@@ -138,7 +137,6 @@ class MainActivity : AppCompatActivity() {
         getDiskSpaceButton = findViewById(R.id.get_disk_space)
         changeSdkModeLedAnimationStatusButton = findViewById(R.id.change_sdk_mode_led_animation_status)
         changePpiModeLedAnimationStatusButton = findViewById(R.id.change_ppi_mode_led_animation_status)
-        doFactoryResetButton = findViewById(R.id.do_factory_reset)
 
         //Verity Sense recording buttons
         listRecordingsButton = findViewById(R.id.list_recordings)
@@ -805,18 +803,6 @@ class MainActivity : AppCompatActivity() {
                         enablePpiModeLedAnimation = !enablePpiModeLedAnimation
                     },
                     { error: Throwable -> Log.e(TAG, "changePpiModeLedAnimationStatus failed: $error") }
-                )
-        }
-
-        doFactoryResetButton.setOnClickListener {
-            api.doFactoryReset(deviceId, preservePairingInformation = true)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    {
-                        Log.d(TAG, "send do factory reset to device")
-                        showToast("send do factory reset to device")
-                    },
-                    { error: Throwable -> Log.e(TAG, "doFactoryReset() failed: $error") }
                 )
         }
 
