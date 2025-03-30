@@ -25,8 +25,6 @@
     <string name="read_exercise">read exercise</string>
     <string name="reading_exercise">reading exercise</string>
     <string name="remove_exercise">remove exercise</string>
-    <string name="set_time">Set time</string>
-    <string name="get_time">Get time</string>
     <string name="sampling_rate">Sampling rate</string>
     <string name="resolution">Resolution</string>
     <string name="range">Range</string>
@@ -41,4 +39,4 @@
     <string name="disable_sdk_mode_led_animation">Disable SDK mode led animation</string>
     <string name="enable_ppi_mode_led_animation">Enable PPI mode led animation</string>
     <string name="disable_ppi_mode_led_animation">Disable PPI mode led animation</string>
-</resources>
+   </resources>

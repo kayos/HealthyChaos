@@ -60,7 +60,6 @@ class MainActivity : AppCompatActivity() {
                 PolarBleApi.PolarBleSdkFeature.FEATURE_BATTERY_INFO,
                 PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_OFFLINE_RECORDING,
                 PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_ONLINE_STREAMING,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_DEVICE_TIME_SETUP,
                 PolarBleApi.PolarBleSdkFeature.FEATURE_DEVICE_INFO,
                 PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_LED_ANIMATION
             )
@@ -98,8 +97,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var listExercisesButton: Button
     private lateinit var fetchExerciseButton: Button
     private lateinit var removeExerciseButton: Button
-    private lateinit var setTimeButton: Button
-    private lateinit var getTimeButton: Button
     private lateinit var toggleSdkModeButton: Button
     private lateinit var changeSdkModeLedAnimationStatusButton: Button
     private lateinit var changePpiModeLedAnimationStatusButton: Button
@@ -130,8 +127,6 @@ class MainActivity : AppCompatActivity() {
         listExercisesButton = findViewById(R.id.list_exercises)
         fetchExerciseButton = findViewById(R.id.read_exercise)
         removeExerciseButton = findViewById(R.id.remove_exercise)
-        setTimeButton = findViewById(R.id.set_time)
-        getTimeButton = findViewById(R.id.get_time)
         toggleSdkModeButton = findViewById(R.id.toggle_SDK_mode)
         changeSdkModeLedAnimationStatusButton = findViewById(R.id.change_sdk_mode_led_animation_status)
         changePpiModeLedAnimationStatusButton = findViewById(R.id.change_ppi_mode_led_animation_status)
@@ -548,36 +543,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        setTimeButton.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            calendar.time = Date()
-            api.setLocalTime(deviceId, calendar)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    {
-                        val timeSetString = "time ${calendar.time} set to device"
-                        Log.d(TAG, timeSetString)
-                        showToast(timeSetString)
-                    },
-                    { error: Throwable -> Log.e(TAG, "set time failed: $error") }
-                )
-        }
-
-        getTimeButton.setOnClickListener {
-            api.getLocalTime(deviceId)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { calendar ->
-                        val timeGetString = "${calendar.time} read from the device"
-                        Log.d(TAG, timeGetString)
-                        showToast(timeGetString)
-
-                    },
-                    { error: Throwable -> Log.e(TAG, "get time failed: $error") }
-                )
-        }
-
-
         listRecordingsButton.setOnClickListener {
             api.listOfflineRecordings(deviceId)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -924,8 +889,6 @@ class MainActivity : AppCompatActivity() {
         listExercisesButton.isEnabled = false
         fetchExerciseButton.isEnabled = false
         removeExerciseButton.isEnabled = false
-        setTimeButton.isEnabled = false
-        getTimeButton.isEnabled = false
         toggleSdkModeButton.isEnabled = false
         //Verity Sense recording buttons
         listRecordingsButton.isEnabled = false
@@ -948,8 +911,6 @@ class MainActivity : AppCompatActivity() {
         listExercisesButton.isEnabled = true
         fetchExerciseButton.isEnabled = true
         removeExerciseButton.isEnabled = true
-        setTimeButton.isEnabled = true
-        getTimeButton.isEnabled = true
         toggleSdkModeButton.isEnabled = true
         //Verity Sense recording buttons
         listRecordingsButton.isEnabled = true
