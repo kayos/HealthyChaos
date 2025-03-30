@@ -18,7 +18,6 @@ import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiCallback
 import com.polar.sdk.api.PolarBleApiDefaultImpl
 import com.polar.sdk.api.errors.PolarInvalidArgument
-import com.polar.sdk.api.model.LedConfig
 import com.polar.sdk.api.model.PolarAccelerometerData
 import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarGyroData
@@ -72,9 +71,7 @@ class MainActivity : AppCompatActivity() {
     private var magDisposable: Disposable? = null
     private var ppgDisposable: Disposable? = null
     private var ppiDisposable: Disposable? = null
-    private var sdkModeEnableDisposable: Disposable? = null
 
-    private var sdkModeEnabledStatus = false
     private var deviceConnected = false
     private var bluetoothEnabled = false
 
@@ -88,9 +85,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var magButton: Button
     private lateinit var ppgButton: Button
     private lateinit var ppiButton: Button
-    private lateinit var toggleSdkModeButton: Button
-    private lateinit var changeSdkModeLedAnimationStatusButton: Button
-    private lateinit var changePpiModeLedAnimationStatusButton: Button
 
     //Verity Sense offline recording use
     private lateinit var listRecordingsButton: Button
@@ -115,9 +109,6 @@ class MainActivity : AppCompatActivity() {
         magButton = findViewById(R.id.mag_button)
         ppgButton = findViewById(R.id.ohr_ppg_button)
         ppiButton = findViewById(R.id.ohr_ppi_button)
-        toggleSdkModeButton = findViewById(R.id.toggle_SDK_mode)
-        changeSdkModeLedAnimationStatusButton = findViewById(R.id.change_sdk_mode_led_animation_status)
-        changePpiModeLedAnimationStatusButton = findViewById(R.id.change_ppi_mode_led_animation_status)
 
         //Verity Sense recording buttons
         listRecordingsButton = findViewById(R.id.list_recordings)
@@ -164,7 +155,6 @@ class MainActivity : AppCompatActivity() {
                 deviceConnected = false
                 val buttonText = getString(R.string.connect_to_device, deviceId)
                 toggleButtonUp(connectButton, buttonText)
-                toggleButtonUp(toggleSdkModeButton, R.string.enable_sdk_mode)
             }
 
             override fun disInformationReceived(
@@ -568,89 +558,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        toggleSdkModeButton.setOnClickListener {
-            toggleSdkModeButton.isEnabled = false
-            if (!sdkModeEnabledStatus) {
-                sdkModeEnableDisposable = api.enableSDKMode(deviceId)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        {
-                            Log.d(TAG, "SDK mode enabled")
-                            // at this point dispose all existing streams. SDK mode enable command
-                            // stops all the streams but client is not informed. This is workaround
-                            // for the bug.
-                            disposeAllStreams()
-                            toggleSdkModeButton.isEnabled = true
-                            sdkModeEnabledStatus = true
-                            toggleButtonDown(toggleSdkModeButton, R.string.disable_sdk_mode)
-                        },
-                        { error ->
-                            toggleSdkModeButton.isEnabled = true
-                            val errorString = "SDK mode enable failed: $error"
-                            showToast(errorString)
-                            Log.e(TAG, errorString)
-                        }
-                    )
-            } else {
-                sdkModeEnableDisposable = api.disableSDKMode(deviceId)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        {
-                            Log.d(TAG, "SDK mode disabled")
-                            toggleSdkModeButton.isEnabled = true
-                            sdkModeEnabledStatus = false
-                            toggleButtonUp(toggleSdkModeButton, R.string.enable_sdk_mode)
-                        },
-                        { error ->
-                            toggleSdkModeButton.isEnabled = true
-                            val errorString = "SDK mode disable failed: $error"
-                            showToast(errorString)
-                            Log.e(TAG, errorString)
-                        }
-                    )
-            }
-        }
-
-        var enableSdkModelLedAnimation = false
-        var enablePpiModeLedAnimation = false
-        changeSdkModeLedAnimationStatusButton.setOnClickListener {
-            api.setLedConfig(deviceId, LedConfig(
-                sdkModeLedEnabled = enableSdkModelLedAnimation,
-                ppiModeLedEnabled = !enablePpiModeLedAnimation))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    {
-                        Log.d(TAG, "SdkModeledAnimationEnabled set to $enableSdkModelLedAnimation")
-                        showToast("SdkModeLedAnimationEnabled set to $enableSdkModelLedAnimation")
-                        changeSdkModeLedAnimationStatusButton.text =
-                            if (enableSdkModelLedAnimation) getString(R.string.disable_sdk_mode_led_animation) else getString(
-                                R.string.enable_sdk_mode_led_animation
-                            )
-                        enableSdkModelLedAnimation = !enableSdkModelLedAnimation
-                    },
-                    { error: Throwable -> Log.e(TAG, "changeSdkModeLedAnimationStatus failed: $error") }
-                )
-        }
-
-        changePpiModeLedAnimationStatusButton.setOnClickListener {
-            api.setLedConfig(deviceId, LedConfig(
-                sdkModeLedEnabled = !enableSdkModelLedAnimation,
-                ppiModeLedEnabled = enablePpiModeLedAnimation))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    {
-                        Log.d(TAG, "PpiModeLedAnimationEnabled set to $enablePpiModeLedAnimation")
-                        showToast("PpiModeLedAnimationEnabled set to $enablePpiModeLedAnimation")
-                        changePpiModeLedAnimationStatusButton.text =
-                            if (enablePpiModeLedAnimation) getString(R.string.disable_ppi_mode_led_animation) else getString(
-                                R.string.enable_ppi_mode_led_animation
-                            )
-                        enablePpiModeLedAnimation = !enablePpiModeLedAnimation
-                    },
-                    { error: Throwable -> Log.e(TAG, "changePpiModeLedAnimationStatus failed: $error") }
-                )
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT), PERMISSION_REQUEST_CODE)
@@ -780,7 +687,6 @@ class MainActivity : AppCompatActivity() {
         magButton.isEnabled = false
         ppgButton.isEnabled = false
         ppiButton.isEnabled = false
-        toggleSdkModeButton.isEnabled = false
         //Verity Sense recording buttons
         listRecordingsButton.isEnabled = false
         startRecordingButton.isEnabled = false
@@ -799,7 +705,6 @@ class MainActivity : AppCompatActivity() {
         magButton.isEnabled = true
         ppgButton.isEnabled = true
         ppiButton.isEnabled = true
-        toggleSdkModeButton.isEnabled = true
         //Verity Sense recording buttons
         listRecordingsButton.isEnabled = true
         startRecordingButton.isEnabled = true
