@@ -76,8 +76,6 @@ class MainActivity : AppCompatActivity() {
     private var ppgDisposable: Disposable? = null
     private var ppiDisposable: Disposable? = null
     private var sdkModeEnableDisposable: Disposable? = null
-    private var recordingStartStopDisposable: Disposable? = null
-    private var recordingStatusReadDisposable: Disposable? = null
     private var listExercisesDisposable: Disposable? = null
     private var fetchExerciseDisposable: Disposable? = null
     private var removeExerciseDisposable: Disposable? = null
