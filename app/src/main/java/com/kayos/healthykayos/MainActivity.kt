@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var broadcastDisposable: Disposable
     private var scanDisposable: Disposable? = null
-    private var autoConnectDisposable: Disposable? = null
     private var hrDisposable: Disposable? = null
     private var accDisposable: Disposable? = null
     private var gyrDisposable: Disposable? = null
@@ -66,7 +65,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var broadcastButton: Button
     private lateinit var connectButton: Button
-    private lateinit var autoConnectButton: Button
     private lateinit var scanButton: Button
     private lateinit var hrButton: Button
     private lateinit var accButton: Button
@@ -90,7 +88,6 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "version: " + PolarBleApiDefaultImpl.versionInfo())
         broadcastButton = findViewById(R.id.broadcast_button)
         connectButton = findViewById(R.id.connect_button)
-        autoConnectButton = findViewById(R.id.auto_connect_button)
         scanButton = findViewById(R.id.scan_button)
         hrButton = findViewById(R.id.hr_button)
         accButton = findViewById(R.id.acc_button)
@@ -209,17 +206,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 Log.e(TAG, "Failed to $attempt. Reason $polarInvalidArgument ")
             }
-        }
-
-        autoConnectButton.setOnClickListener {
-            if (autoConnectDisposable != null) {
-                autoConnectDisposable?.dispose()
-            }
-            autoConnectDisposable = sensor.api.autoConnectToDevice(-60, "180D", null)
-                .subscribe(
-                    { Log.d(TAG, "auto connect search complete") },
-                    { throwable: Throwable -> Log.e(TAG, "" + throwable.toString()) }
-                )
         }
 
         scanButton.setOnClickListener {
@@ -669,7 +655,6 @@ class MainActivity : AppCompatActivity() {
     private fun disableAllButtons() {
         broadcastButton.isEnabled = false
         connectButton.isEnabled = false
-        autoConnectButton.isEnabled = false
         scanButton.isEnabled = false
         accButton.isEnabled = false
         gyrButton.isEnabled = false
@@ -687,7 +672,6 @@ class MainActivity : AppCompatActivity() {
     private fun enableAllButtons() {
         broadcastButton.isEnabled = true
         connectButton.isEnabled = true
-        autoConnectButton.isEnabled = true
         scanButton.isEnabled = true
         accButton.isEnabled = true
         gyrButton.isEnabled = true

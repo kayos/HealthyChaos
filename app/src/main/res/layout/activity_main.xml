@@ -33,12 +33,6 @@
             android:text="@string/connect_to_device" />
 
         <Button
-            android:id="@+id/auto_connect_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/auto_connect_toggle" />
-
-        <Button
             android:id="@+id/scan_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
