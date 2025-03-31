@@ -47,21 +47,10 @@ class MainActivity : AppCompatActivity() {
     // ATTENTION! Replace with the device ID from your device.
     private var deviceId = ""
 
-    private val api: PolarBleApi by lazy {
-        // Notice all features are enabled
-        PolarBleApiDefaultImpl.defaultImplementation(
-            applicationContext,
-            setOf(
-                PolarBleApi.PolarBleSdkFeature.FEATURE_HR,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_SDK_MODE,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_BATTERY_INFO,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_OFFLINE_RECORDING,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_ONLINE_STREAMING,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_DEVICE_INFO,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_LED_ANIMATION
-            )
-        )
+    private val sensor: PolarHeartRateSensor by lazy {
+        HeartRateProviderFactory.getPolarHeartRateSensor(applicationContext)
     }
+
     private lateinit var broadcastDisposable: Disposable
     private var scanDisposable: Disposable? = null
     private var autoConnectDisposable: Disposable? = null
@@ -117,15 +106,15 @@ class MainActivity : AppCompatActivity() {
         downloadRecordingButton = findViewById(R.id.download_recording)
         deleteRecordingButton = findViewById(R.id.delete_recording)
 
-        api.setPolarFilter(false)
+        sensor.api.setPolarFilter(false)
 
         // If there is need to log what is happening inside the SDK, it can be enabled like this:
         val enableSdkLogs = false
         if(enableSdkLogs) {
-            api.setApiLogger { s: String -> Log.d(API_LOGGER_TAG, s) }
+            sensor.api.setApiLogger { s: String -> Log.d(API_LOGGER_TAG, s) }
         }
 
-        api.setApiCallback(object : PolarBleApiCallback() {
+        sensor.api.setApiCallback(object : PolarBleApiCallback() {
             override fun blePowerStateChanged(powered: Boolean) {
                 Log.d(TAG, "BLE power: $powered")
                 bluetoothEnabled = powered
@@ -187,7 +176,7 @@ class MainActivity : AppCompatActivity() {
         broadcastButton.setOnClickListener {
             if (!this::broadcastDisposable.isInitialized || broadcastDisposable.isDisposed) {
                 toggleButtonDown(broadcastButton, R.string.listening_broadcast)
-                broadcastDisposable = api.startListenForPolarHrBroadcasts(null)
+                broadcastDisposable = sensor.api.startListenForPolarHrBroadcasts(null)
                     .subscribe(
                         { polarBroadcastData: PolarHrBroadcastData ->
                             Log.d(TAG, "HR BROADCAST ${polarBroadcastData.polarDeviceInfo.deviceId} HR: ${polarBroadcastData.hr} batt: ${polarBroadcastData.batteryStatus}")
@@ -208,9 +197,9 @@ class MainActivity : AppCompatActivity() {
         connectButton.setOnClickListener {
             try {
                 if (deviceConnected) {
-                    api.disconnectFromDevice(deviceId)
+                    sensor.api.disconnectFromDevice(deviceId)
                 } else {
-                    api.connectToDevice(deviceId)
+                    sensor.api.connectToDevice(deviceId)
                 }
             } catch (polarInvalidArgument: PolarInvalidArgument) {
                 val attempt = if (deviceConnected) {
@@ -226,7 +215,7 @@ class MainActivity : AppCompatActivity() {
             if (autoConnectDisposable != null) {
                 autoConnectDisposable?.dispose()
             }
-            autoConnectDisposable = api.autoConnectToDevice(-60, "180D", null)
+            autoConnectDisposable = sensor.api.autoConnectToDevice(-60, "180D", null)
                 .subscribe(
                     { Log.d(TAG, "auto connect search complete") },
                     { throwable: Throwable -> Log.e(TAG, "" + throwable.toString()) }
@@ -237,7 +226,7 @@ class MainActivity : AppCompatActivity() {
             val isDisposed = scanDisposable?.isDisposed ?: true
             if (isDisposed) {
                 toggleButtonDown(scanButton, R.string.scanning_devices)
-                scanDisposable = api.searchForDevice()
+                scanDisposable = sensor.api.searchForDevice()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         { polarDeviceInfo: PolarDeviceInfo ->
@@ -262,7 +251,7 @@ class MainActivity : AppCompatActivity() {
             val isDisposed = hrDisposable?.isDisposed ?: true
             if (isDisposed) {
                 toggleButtonDown(hrButton, R.string.stop_hr_stream)
-                hrDisposable = api.startHrStreaming(deviceId)
+                hrDisposable = sensor.api.startHrStreaming(deviceId)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         { hrData: PolarHrData ->
@@ -289,7 +278,7 @@ class MainActivity : AppCompatActivity() {
                 toggleButtonDown(accButton, R.string.stop_acc_stream)
                 accDisposable = requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.ACC)
                     .flatMap { settings: PolarSensorSetting ->
-                        api.startAccStreaming(deviceId, settings)
+                        sensor.api.startAccStreaming(deviceId, settings)
                     }
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
@@ -321,7 +310,7 @@ class MainActivity : AppCompatActivity() {
                 gyrDisposable =
                     requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.GYRO)
                         .flatMap { settings: PolarSensorSetting ->
-                            api.startGyroStreaming(deviceId, settings)
+                            sensor.api.startGyroStreaming(deviceId, settings)
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -350,7 +339,7 @@ class MainActivity : AppCompatActivity() {
                 magDisposable =
                     requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.MAGNETOMETER)
                         .flatMap { settings: PolarSensorSetting ->
-                            api.startMagnetometerStreaming(deviceId, settings)
+                            sensor.api.startMagnetometerStreaming(deviceId, settings)
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -379,7 +368,7 @@ class MainActivity : AppCompatActivity() {
                 ppgDisposable =
                     requestStreamSettings(deviceId, PolarBleApi.PolarDeviceDataType.PPG)
                         .flatMap { settings: PolarSensorSetting ->
-                            api.startPpgStreaming(deviceId, settings)
+                            sensor.api.startPpgStreaming(deviceId, settings)
                         }
                         .subscribe(
                             { polarPpgData: PolarPpgData ->
@@ -406,7 +395,7 @@ class MainActivity : AppCompatActivity() {
             val isDisposed = ppiDisposable?.isDisposed ?: true
             if (isDisposed) {
                 toggleButtonDown(ppiButton, R.string.stop_ppi_stream)
-                ppiDisposable = api.startPpiStreaming(deviceId)
+                ppiDisposable = sensor.api.startPpiStreaming(deviceId)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         { ppiData: PolarPpiData ->
@@ -428,7 +417,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         listRecordingsButton.setOnClickListener {
-            api.listOfflineRecordings(deviceId)
+            sensor.api.listOfflineRecordings(deviceId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
                     entryCache[deviceId] = mutableListOf()
@@ -466,7 +455,7 @@ class MainActivity : AppCompatActivity() {
                     0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
                 )
             )
-            api.startOfflineRecording(deviceId, PolarBleApi.PolarDeviceDataType.ACC, PolarSensorSetting(settings.toMap()), yourSecret)
+            sensor.api.startOfflineRecording(deviceId, PolarBleApi.PolarDeviceDataType.ACC, PolarSensorSetting(settings.toMap()), yourSecret)
                 //Without a secret key
                 //api.startOfflineRecording(deviceId, PolarBleApi.PolarDeviceDataType.ACC, PolarSensorSetting(settings.toMap()))
                 .subscribe(
@@ -478,7 +467,7 @@ class MainActivity : AppCompatActivity() {
         stopRecordingButton.setOnClickListener {
             //Example of stopping ACC offline recording
             Log.d(TAG, "Stops ACC recording")
-            api.stopOfflineRecording(deviceId, PolarBleApi.PolarDeviceDataType.ACC)
+            sensor.api.stopOfflineRecording(deviceId, PolarBleApi.PolarDeviceDataType.ACC)
                 .subscribe(
                     { Log.d(TAG, "stop offline recording completed") },
                     { throwable: Throwable -> Log.e(TAG, "" + throwable.toString()) }
@@ -502,7 +491,7 @@ class MainActivity : AppCompatActivity() {
                             0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
                         )
                     )
-                    api.getOfflineRecord(deviceId, offlineEntry, yourSecret)
+                    sensor.api.getOfflineRecord(deviceId, offlineEntry, yourSecret)
                         //Not using a secret key
                         //api.getOfflineRecord(deviceId, offlineEntry)
                         .subscribe(
@@ -539,7 +528,7 @@ class MainActivity : AppCompatActivity() {
             val offlineRecEntry = entryCache[deviceId]?.firstOrNull()
             offlineRecEntry?.let { offlineEntry ->
                 try {
-                    api.removeOfflineRecord(deviceId, offlineEntry)
+                    sensor.api.removeOfflineRecord(deviceId, offlineEntry)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                             {
@@ -591,12 +580,12 @@ class MainActivity : AppCompatActivity() {
 
     public override fun onResume() {
         super.onResume()
-        api.foregroundEntered()
+        sensor.api.foregroundEntered()
     }
 
     public override fun onDestroy() {
         super.onDestroy()
-        api.shutDown()
+        sensor.api.shutDown()
     }
 
     private fun toggleButtonDown(button: Button, text: String? = null) {
@@ -630,8 +619,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestStreamSettings(identifier: String, feature: PolarBleApi.PolarDeviceDataType)
     : Flowable<PolarSensorSetting> {
-        val availableSettings = api.requestStreamSettings(identifier, feature)
-        val allSettings = api.requestFullStreamSettings(identifier, feature)
+        val availableSettings = sensor.api.requestStreamSettings(identifier, feature)
+        val allSettings = sensor.api.requestFullStreamSettings(identifier, feature)
             .onErrorReturn { error: Throwable ->
                 Log.w(TAG, "Full stream settings are not available for feature $feature. REASON: $error")
                 PolarSensorSetting(emptyMap())
