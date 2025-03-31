@@ -37,4 +37,12 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
         return api.searchForDevice()
     }
 
+    override fun connect(id: String) {
+        api.connectToDevice(id)
+    }
+
+    override fun disconnect(id: String) {
+        api.disconnectFromDevice(id)
+    }
+
 }

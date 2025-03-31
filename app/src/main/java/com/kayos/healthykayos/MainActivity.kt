@@ -197,9 +197,9 @@ class MainActivity : AppCompatActivity() {
         connectButton.setOnClickListener {
             try {
                 if (deviceConnected) {
-                    sensor.api.disconnectFromDevice(deviceId)
+                    sensor.disconnect(deviceId)
                 } else {
-                    sensor.api.connectToDevice(deviceId)
+                    sensor.connect(deviceId)
                 }
             } catch (polarInvalidArgument: PolarInvalidArgument) {
                 val attempt = if (deviceConnected) {
