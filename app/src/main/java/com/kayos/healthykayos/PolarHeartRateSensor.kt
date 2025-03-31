@@ -3,8 +3,10 @@ package com.kayos.healthykayos
 import android.content.Context
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiDefaultImpl
+import com.polar.sdk.api.model.PolarDeviceInfo
+import io.reactivex.rxjava3.core.Flowable
 
-class PolarHeartRateSensor private constructor(context: Context){
+class PolarHeartRateSensor private constructor(context: Context): IHeartRateSensor {
     //TODO make private once refactor is done
     val api: PolarBleApi = PolarBleApiDefaultImpl.defaultImplementation(
             context,
@@ -29,4 +31,10 @@ class PolarHeartRateSensor private constructor(context: Context){
                 instance ?: PolarHeartRateSensor(context).also { instance = it }
             }
     }
+
+    override fun search(): Flowable<PolarDeviceInfo> {
+        api.setPolarFilter(true);
+        return api.searchForDevice()
+    }
+
 }

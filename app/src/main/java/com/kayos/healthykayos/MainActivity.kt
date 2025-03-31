@@ -226,7 +226,7 @@ class MainActivity : AppCompatActivity() {
             val isDisposed = scanDisposable?.isDisposed ?: true
             if (isDisposed) {
                 toggleButtonDown(scanButton, R.string.scanning_devices)
-                scanDisposable = sensor.api.searchForDevice()
+                scanDisposable = sensor.search()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         { polarDeviceInfo: PolarDeviceInfo ->
