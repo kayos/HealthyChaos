@@ -1,4 +1,4 @@
-package com.kayos.healthykayos
+package com.kayos.healthykayos.sensor
 
 import android.content.Context
 

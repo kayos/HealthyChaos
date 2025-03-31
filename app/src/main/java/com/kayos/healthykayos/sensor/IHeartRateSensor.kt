@@ -1,4 +1,4 @@
-package com.kayos.healthykayos
+package com.kayos.healthykayos.sensor
 
 import com.polar.sdk.api.model.PolarDeviceInfo
 import io.reactivex.rxjava3.core.Flowable
