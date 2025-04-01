@@ -5,6 +5,7 @@ import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiDefaultImpl
 import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHrData
+import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import io.reactivex.rxjava3.core.Flowable
 
 class PolarHeartRateSensor private constructor(context: Context): IHeartRateSensor {
@@ -48,6 +49,10 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
 
     override fun startHR(id: String): Flowable<PolarHrData> {
         return api.startHrStreaming(id)
+    }
+
+    override fun listRecordings(id: String): Flowable<PolarOfflineRecordingEntry> {
+        return api.listOfflineRecordings(id)
     }
 
 }

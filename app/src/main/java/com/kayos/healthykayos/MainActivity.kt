@@ -381,7 +381,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         listRecordingsButton.setOnClickListener {
-            sensor.api.listOfflineRecordings(deviceId)
+            sensor.listRecordings(deviceId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
                     entryCache[deviceId] = mutableListOf()
