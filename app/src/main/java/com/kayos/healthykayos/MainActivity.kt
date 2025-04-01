@@ -24,7 +24,6 @@ import com.polar.sdk.api.model.PolarAccelerometerData
 import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarGyroData
 import com.polar.sdk.api.model.PolarHealthThermometerData
-import com.polar.sdk.api.model.PolarHrBroadcastData
 import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarMagnetometerData
 import com.polar.sdk.api.model.PolarOfflineRecordingData
@@ -53,7 +52,6 @@ class MainActivity : AppCompatActivity() {
         HeartRateProviderFactory.getPolarHeartRateSensor(applicationContext)
     }
 
-    private lateinit var broadcastDisposable: Disposable
     private var scanDisposable: Disposable? = null
     private var hrDisposable: Disposable? = null
     private var accDisposable: Disposable? = null
@@ -65,7 +63,6 @@ class MainActivity : AppCompatActivity() {
     private var deviceConnected = false
     private var bluetoothEnabled = false
 
-    private lateinit var broadcastButton: Button
     private lateinit var connectButton: Button
     private lateinit var scanButton: Button
     private lateinit var hrButton: Button
@@ -88,7 +85,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.d(TAG, "version: " + PolarBleApiDefaultImpl.versionInfo())
-        broadcastButton = findViewById(R.id.broadcast_button)
         connectButton = findViewById(R.id.connect_button)
         scanButton = findViewById(R.id.scan_button)
         hrButton = findViewById(R.id.hr_button)
@@ -171,26 +167,6 @@ class MainActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
         })
-
-        broadcastButton.setOnClickListener {
-            if (!this::broadcastDisposable.isInitialized || broadcastDisposable.isDisposed) {
-                toggleButtonDown(broadcastButton, R.string.listening_broadcast)
-                broadcastDisposable = sensor.api.startListenForPolarHrBroadcasts(null)
-                    .subscribe(
-                        { polarBroadcastData: PolarHrBroadcastData ->
-                            Log.d(TAG, "HR BROADCAST ${polarBroadcastData.polarDeviceInfo.deviceId} HR: ${polarBroadcastData.hr} batt: ${polarBroadcastData.batteryStatus}")
-                        },
-                        { error: Throwable ->
-                            toggleButtonUp(broadcastButton, R.string.listen_broadcast)
-                            Log.e(TAG, "Broadcast listener failed. Reason $error")
-                        },
-                        { Log.d(TAG, "complete") }
-                    )
-            } else {
-                toggleButtonUp(broadcastButton, R.string.listen_broadcast)
-                broadcastDisposable.dispose()
-            }
-        }
 
         connectButton.text = getString(R.string.connect_to_device, deviceId)
         connectButton.setOnClickListener {
@@ -655,7 +631,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun disableAllButtons() {
-        broadcastButton.isEnabled = false
         connectButton.isEnabled = false
         scanButton.isEnabled = false
         accButton.isEnabled = false
@@ -672,7 +647,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun enableAllButtons() {
-        broadcastButton.isEnabled = true
         connectButton.isEnabled = true
         scanButton.isEnabled = true
         accButton.isEnabled = true
