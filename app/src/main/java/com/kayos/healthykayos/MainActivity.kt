@@ -215,7 +215,7 @@ class MainActivity : AppCompatActivity() {
             val isDisposed = hrDisposable?.isDisposed ?: true
             if (isDisposed) {
                 toggleButtonDown(hrButton, R.string.stop_hr_stream)
-                hrDisposable = sensor.api.startHrStreaming(deviceId)
+                hrDisposable = sensor.startHR(deviceId)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         { hrData: PolarHrData ->
