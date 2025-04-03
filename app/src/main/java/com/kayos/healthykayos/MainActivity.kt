@@ -11,6 +11,10 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.snackbar.Snackbar
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
@@ -100,6 +104,18 @@ class MainActivity : AppCompatActivity() {
         stopRecordingButton = findViewById(R.id.stop_recording)
         downloadRecordingButton = findViewById(R.id.download_recording)
         deleteRecordingButton = findViewById(R.id.delete_recording)
+
+
+        //COMPOSE ---------------
+        val composeView = findViewById<ComposeView>(R.id.compose_view)
+        composeView.apply {
+            setContent {
+                MaterialTheme {
+                    Greeting("Hello Compose!")
+                }
+            }
+        }
+        //---------------------------
 
         sensor.api.setPolarFilter(false)
 
@@ -520,6 +536,11 @@ class MainActivity : AppCompatActivity() {
         } else {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), PERMISSION_REQUEST_CODE)
         }
+    }
+
+    @Composable
+    fun Greeting(name: String) {
+        Text(text = "Hello $name!")
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
