@@ -12,5 +12,5 @@ interface IHeartRateSensor {
 
     fun startHR(id: String): Flowable<PolarHrData>
 
-    fun listRecordings(id: String): Flowable<PolarOfflineRecordingEntry>
+    fun listRecordings(id: String)
 }

@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.util.Pair
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -12,14 +13,17 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.snackbar.Snackbar
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
@@ -519,43 +523,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     @Composable
     fun Recordings() {
-        var recordings = remember {
-            mutableStateOf(emptyList<PolarOfflineRecordingEntry>())
-        }
+        val recordings = sensor.recordings.collectAsState().value
         Column {
             Button(onClick = {
-                // LEAK? subscription not unsubscribed?
                 sensor.listRecordings(deviceId)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnSubscribe {
-                        entryCache[deviceId] = mutableListOf()
-                        recordings.value = emptyList<PolarOfflineRecordingEntry>()
-                    }
-                    .map {
-                        entryCache[deviceId]?.add(it)
-                        it
-                    }
-                    .subscribe(
-                        { polarOfflineRecordingEntry: PolarOfflineRecordingEntry ->
-                            recordings.value =
-                                recordings.value.toMutableList() + polarOfflineRecordingEntry
-                            Log.d(
-                                TAG,
-                                "next: ${polarOfflineRecordingEntry.date} path: ${polarOfflineRecordingEntry.path} size: ${polarOfflineRecordingEntry.size}"
-                            )
-                        },
-                        { error: Throwable -> Log.e(TAG, "Failed to list recordings: $error") },
-                        { Log.d(TAG, "list recordings complete") }
-                    )
             }) {
                 Text("Refresh")
             }
             Column {
-                recordings.value.forEach { recording ->
-                    Text(recording.date.toString(),color = Color.White)
+                recordings.forEach { recording ->
+                    Text(recording.date.toString(), color = Color.White)
                 }
             }
         }
@@ -634,12 +613,12 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Log.d(TAG, "Feature " + feature + " available settings " + available.settings)
                 Log.d(TAG, "Feature " + feature + " all settings " + all.settings)
-                return@zip android.util.Pair(available, all)
+                return@zip Pair(available, all)
             }
         }
             .observeOn(AndroidSchedulers.mainThread())
             .toFlowable()
-            .flatMap { sensorSettings: android.util.Pair<PolarSensorSetting, PolarSensorSetting> ->
+            .flatMap { sensorSettings: Pair<PolarSensorSetting, PolarSensorSetting> ->
                 DialogUtility.showAllSettingsDialog(
                     this@MainActivity,
                     sensorSettings.first.settings,

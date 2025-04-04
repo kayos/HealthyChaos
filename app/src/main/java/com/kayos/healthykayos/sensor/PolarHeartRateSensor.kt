@@ -1,14 +1,26 @@
 package com.kayos.healthykayos.sensor
 
 import android.content.Context
+import android.util.Log
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiDefaultImpl
 import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class PolarHeartRateSensor private constructor(context: Context): IHeartRateSensor {
+
+    private  var recordingDisposable : Disposable? = null
+    private val _recordings = MutableStateFlow<List<PolarOfflineRecordingEntry>>(emptyList())
+    val recordings: StateFlow<List<PolarOfflineRecordingEntry>> get() = _recordings
+
+
     //TODO make private once refactor is done
     val api: PolarBleApi = PolarBleApiDefaultImpl.defaultImplementation(
             context,
@@ -51,8 +63,19 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
         return api.startHrStreaming(id)
     }
 
-    override fun listRecordings(id: String): Flowable<PolarOfflineRecordingEntry> {
-        return api.listOfflineRecordings(id)
+    override fun listRecordings(id: String) {
+        recordingDisposable?.dispose()
+        recordingDisposable = api.listOfflineRecordings(id)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { recording: PolarOfflineRecordingEntry ->
+                    _recordings.value = _recordings.value + recording
+                },
+                onError = { error: Throwable ->
+                    Log.e(TAG, "Failed to list recordings: $error")
+                },
+                onComplete = { recordingDisposable?.dispose() }
+            )
     }
 
 }
