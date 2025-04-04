@@ -82,7 +82,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var ppiButton: Button
 
     //Verity Sense offline recording use
-    private lateinit var listRecordingsButton: Button
     private lateinit var startRecordingButton: Button
     private lateinit var stopRecordingButton: Button
     private lateinit var downloadRecordingButton: Button
@@ -104,7 +103,6 @@ class MainActivity : AppCompatActivity() {
         ppiButton = findViewById(R.id.ohr_ppi_button)
 
         //Verity Sense recording buttons
-        listRecordingsButton = findViewById(R.id.list_recordings)
         startRecordingButton = findViewById(R.id.start_recording)
         stopRecordingButton = findViewById(R.id.stop_recording)
         downloadRecordingButton = findViewById(R.id.download_recording)
@@ -401,28 +399,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        listRecordingsButton.setOnClickListener {
-            sensor.listRecordings(deviceId)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe {
-                    entryCache[deviceId] = mutableListOf()
-                }
-                .map {
-                    entryCache[deviceId]?.add(it)
-                    it
-                }
-                .subscribe(
-                    { polarOfflineRecordingEntry: PolarOfflineRecordingEntry ->
-                        Log.d(
-                            TAG,
-                            "next: ${polarOfflineRecordingEntry.date} path: ${polarOfflineRecordingEntry.path} size: ${polarOfflineRecordingEntry.size}"
-                        )
-                    },
-                    { error: Throwable -> Log.e(TAG, "Failed to list recordings: $error") },
-                    { Log.d(TAG, "list recordings complete") }
-                )
-        }
-
         startRecordingButton.setOnClickListener {
             //Example of starting ACC offline recording
             Log.d(TAG, "Starts ACC recording")
@@ -551,7 +527,6 @@ class MainActivity : AppCompatActivity() {
         }
         Column {
             Button(onClick = {
-
                 // LEAK? subscription not unsubscribed?
                 sensor.listRecordings(deviceId)
                     .observeOn(AndroidSchedulers.mainThread())
@@ -703,7 +678,6 @@ class MainActivity : AppCompatActivity() {
         ppgButton.isEnabled = false
         ppiButton.isEnabled = false
         //Verity Sense recording buttons
-        listRecordingsButton.isEnabled = false
         startRecordingButton.isEnabled = false
         stopRecordingButton.isEnabled = false
         downloadRecordingButton.isEnabled = false
@@ -719,7 +693,6 @@ class MainActivity : AppCompatActivity() {
         ppgButton.isEnabled = true
         ppiButton.isEnabled = true
         //Verity Sense recording buttons
-        listRecordingsButton.isEnabled = true
         startRecordingButton.isEnabled = true
         stopRecordingButton.isEnabled = true
         downloadRecordingButton.isEnabled = true

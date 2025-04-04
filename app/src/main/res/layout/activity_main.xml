@@ -96,12 +96,6 @@
             android:background="@android:color/white" />
 
         <Button
-            android:id="@+id/list_recordings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/list_recordings" />
-
-        <Button
             android:id="@+id/start_recording"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
