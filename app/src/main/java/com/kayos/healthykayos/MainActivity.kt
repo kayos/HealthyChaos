@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
 
 
         //COMPOSE ---------------
-        val composeView = findViewById<ComposeView>(R.id.compose_view)
+        val composeView = findViewById<ComposeView>(R.id.recordings_view)
         composeView.apply {
             setContent {
                 MaterialTheme {

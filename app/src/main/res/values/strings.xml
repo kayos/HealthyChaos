@@ -27,4 +27,8 @@
     <string name="stop_recording">stop verity sense recording</string>
     <string name="download_recording">download one verity sense recording</string>
     <string name="delete_recording">delete one verity sense recording</string>
+    <string name="first_fragment_label">First\n</string>
+    <string name="second_fragment_label">Second</string>
+    <string name="next">Connect</string>
+    <string name="back">Back</string>
 </resources>
