@@ -14,7 +14,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.snackbar.Snackbar
@@ -112,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         composeView.apply {
             setContent {
                 MaterialTheme {
-                    Recordings( emptyList())
+                    Recordings()
                 }
             }
         }
@@ -539,11 +543,45 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     @Composable
-    fun Recordings(recordings: List<PolarOfflineRecordingEntry>) {
+    fun Recordings() {
+        var recordings = remember {
+            mutableStateOf(emptyList<PolarOfflineRecordingEntry>())
+        }
         Column {
-            recordings.forEach { recording ->
-                Text(recording.date.toString())
+            Button(onClick = {
+
+                // LEAK? subscription not unsubscribed?
+                sensor.listRecordings(deviceId)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe {
+                        entryCache[deviceId] = mutableListOf()
+                        recordings.value = emptyList<PolarOfflineRecordingEntry>()
+                    }
+                    .map {
+                        entryCache[deviceId]?.add(it)
+                        it
+                    }
+                    .subscribe(
+                        { polarOfflineRecordingEntry: PolarOfflineRecordingEntry ->
+                            recordings.value =
+                                recordings.value.toMutableList() + polarOfflineRecordingEntry
+                            Log.d(
+                                TAG,
+                                "next: ${polarOfflineRecordingEntry.date} path: ${polarOfflineRecordingEntry.path} size: ${polarOfflineRecordingEntry.size}"
+                            )
+                        },
+                        { error: Throwable -> Log.e(TAG, "Failed to list recordings: $error") },
+                        { Log.d(TAG, "list recordings complete") }
+                    )
+            }) {
+                Text("Refresh")
+            }
+            Column {
+                recordings.value.forEach { recording ->
+                    Text(recording.date.toString(),color = Color.White)
+                }
             }
         }
     }
