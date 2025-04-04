@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -111,7 +112,7 @@ class MainActivity : AppCompatActivity() {
         composeView.apply {
             setContent {
                 MaterialTheme {
-                    Greeting("Hello Compose!")
+                    Recordings( emptyList())
                 }
             }
         }
@@ -539,8 +540,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun Greeting(name: String) {
-        Text(text = "Hello $name!")
+    fun Recordings(recordings: List<PolarOfflineRecordingEntry>) {
+        Column {
+            recordings.forEach { recording ->
+                Text(recording.date.toString())
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
