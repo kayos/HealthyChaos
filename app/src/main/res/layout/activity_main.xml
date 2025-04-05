@@ -125,10 +125,6 @@
             android:layout_height="wrap_content"
             android:text="@string/delete_recording" />
 
-        <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/recordings_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
     </LinearLayout>
     <include layout="@layout/content_heart_rate" />
 </androidx.constraintlayout.widget.ConstraintLayout>

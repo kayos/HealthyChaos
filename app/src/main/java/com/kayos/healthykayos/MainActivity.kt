@@ -112,19 +112,10 @@ class MainActivity : AppCompatActivity() {
         downloadRecordingButton = findViewById(R.id.download_recording)
         deleteRecordingButton = findViewById(R.id.delete_recording)
 
-
-        //COMPOSE ---------------
-        val composeView = findViewById<ComposeView>(R.id.recordings_view)
-        composeView.apply {
-            setContent {
-                MaterialTheme {
-                    Recordings()
-                }
-            }
-        }
         //---------------------------
 
         sensor.api.setPolarFilter(false)
+        sensor.selectedDeviceId = deviceId
 
         // If there is need to log what is happening inside the SDK, it can be enabled like this:
         val enableSdkLogs = false
@@ -520,23 +511,6 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), PERMISSION_REQUEST_CODE)
-        }
-    }
-
-    @Composable
-    fun Recordings() {
-        val recordings = sensor.recordings.collectAsState().value
-        Column {
-            Button(onClick = {
-                sensor.listRecordings(deviceId)
-            }) {
-                Text("Refresh")
-            }
-            Column {
-                recordings.forEach { recording ->
-                    Text(recording.date.toString(), color = Color.White)
-                }
-            }
         }
     }
 

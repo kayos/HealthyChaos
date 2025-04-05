@@ -20,6 +20,8 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
     private val _recordings = MutableStateFlow<List<PolarOfflineRecordingEntry>>(emptyList())
     val recordings: StateFlow<List<PolarOfflineRecordingEntry>> get() = _recordings
 
+    // TODO: set this when specific device is connected, rethink sharing between fragments
+    var selectedDeviceId : String? = null
 
     //TODO make private once refactor is done
     val api: PolarBleApi = PolarBleApiDefaultImpl.defaultImplementation(
