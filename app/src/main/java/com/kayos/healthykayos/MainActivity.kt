@@ -204,24 +204,10 @@ class MainActivity : AppCompatActivity() {
             val isDisposed = scanDisposable?.isDisposed ?: true
             if (isDisposed) {
                 toggleButtonDown(scanButton, R.string.scanning_devices)
-                scanDisposable = sensor.search()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { polarDeviceInfo: PolarDeviceInfo ->
-                            Log.d(TAG, "polar device found id: " + polarDeviceInfo.deviceId + " address: " + polarDeviceInfo.address + " rssi: " + polarDeviceInfo.rssi + " name: " + polarDeviceInfo.name + " isConnectable: " + polarDeviceInfo.isConnectable)
-                        },
-                        { error: Throwable ->
-                            toggleButtonUp(scanButton, "Scan devices")
-                            Log.e(TAG, "Device scan failed. Reason $error")
-                        },
-                        {
-                            toggleButtonUp(scanButton, "Scan devices")
-                            Log.d(TAG, "complete")
-                        }
-                    )
+               sensor.search()
+
             } else {
                 toggleButtonUp(scanButton, "Scan devices")
-                scanDisposable?.dispose()
             }
         }
 

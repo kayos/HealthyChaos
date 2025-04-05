@@ -6,7 +6,7 @@ import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import io.reactivex.rxjava3.core.Flowable
 
 interface IHeartRateSensor {
-    fun search(): Flowable<PolarDeviceInfo>
+    fun search()
     fun connect(id: String): Unit
     fun disconnect(id: String): Unit
 

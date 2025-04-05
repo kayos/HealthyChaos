@@ -20,6 +20,11 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
     private val _recordings = MutableStateFlow<List<PolarOfflineRecordingEntry>>(emptyList())
     val recordings: StateFlow<List<PolarOfflineRecordingEntry>> get() = _recordings
 
+    private  var searchDisposable : Disposable? = null
+    private val _availableDevices = MutableStateFlow<List<PolarDeviceInfo>>(emptyList())
+    val availableDevices: StateFlow<List<PolarDeviceInfo>> get() = _availableDevices
+
+
     // TODO: set this when specific device is connected, rethink sharing between fragments
     var selectedDeviceId : String? = null
 
@@ -48,9 +53,21 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
             }
     }
 
-    override fun search(): Flowable<PolarDeviceInfo> {
+    override fun search() {
         api.setPolarFilter(true);
-        return api.searchForDevice()
+
+        searchDisposable?.dispose()
+        searchDisposable = api.searchForDevice()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {  polarDeviceInfo: PolarDeviceInfo ->
+                    _availableDevices.value = _availableDevices.value + polarDeviceInfo
+                },
+                onError = { error: Throwable ->
+                    Log.e(TAG, "Failed to search: $error")
+                },
+                onComplete = { searchDisposable?.dispose() }
+            )
     }
 
     override fun connect(id: String) {
