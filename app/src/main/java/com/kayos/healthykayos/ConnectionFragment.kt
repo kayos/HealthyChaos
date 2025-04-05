@@ -1,13 +1,19 @@
 package com.kayos.healthykayos
 
 import android.os.Bundle
+import android.view.InputDevice
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -19,12 +25,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import com.kayos.healthykayos.R.id.action_ConnectionFragment_to_RecordingsFragment
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.PolarHeartRateSensor
 import com.polar.sdk.api.model.PolarDeviceInfo
@@ -68,7 +74,7 @@ class ConnectionFragment : Fragment() {
 @Composable
 fun Connections(sensor: PolarHeartRateSensor, navController: NavController) {
     val availableDevices = sensor.availableDevices.collectAsState().value
-    val connectedDevices = sensor.connectedDevices.collectAsState().value
+    val connectedDevice = sensor.connectedDevices.collectAsState().value
 
     Column {
         Button(onClick = {
@@ -83,13 +89,36 @@ fun Connections(sensor: PolarHeartRateSensor, navController: NavController) {
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        Column(modifier = Modifier.padding(16.dp)) {
-            if (connectedDevices.isNotEmpty())
-                Button(onClick = {
-                    navController.navigate(action_ConnectionFragment_to_RecordingsFragment)
-                }) {
-                    Text("Recording")
-                }
+        if (connectedDevice != null)
+            Device(connectedDevice) {
+                navController.navigate(R.id.action_ConnectionFragment_to_RecordingsFragment)
+            }
+    }
+    }
+
+@Composable
+fun Device(device: PolarDeviceInfo, onRecordingsClick: () -> Unit) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)
+        .background(Color.LightGray)) {
+
+        Text("Sensor: ${device.deviceId}", style = MaterialTheme.typography.titleLarge)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Battery and Connection Status
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Signal strength: ${device.rssi}", style = MaterialTheme.typography.bodyMedium)
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onRecordingsClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Recordings")
         }
     }
 }
