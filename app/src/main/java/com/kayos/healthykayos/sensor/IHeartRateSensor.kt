@@ -7,7 +7,6 @@ import io.reactivex.rxjava3.core.Flowable
 
 interface IHeartRateSensor {
     fun search()
-    fun connect(id: String): Unit
     fun connect(device: PolarDeviceInfo): Unit
     fun disconnect(id: String): Unit
 
