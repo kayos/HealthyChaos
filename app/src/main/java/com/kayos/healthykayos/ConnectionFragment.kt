@@ -5,9 +5,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -18,10 +19,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.PolarHeartRateSensor
@@ -47,25 +48,34 @@ class ConnectionFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
-                    Connections(
-                        sensor
-                    )
+                    Column(modifier = Modifier.padding(16.dp)){
+                        Connections(
+                            sensor
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Navigation(findNavController())
+                    }
+
                 }
             }
         }
-        return view }
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        view.findViewById<Button>(R.id.button_first).setOnClickListener {
-            findNavController().navigate(R.id.action_ConnectionFragment_to_RecordingsFragment)
-        }
+        return view
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
+    }
+}
+
+@Composable
+fun Navigation(navController: NavController) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Button(onClick = {
+            navController.navigate(R.id.action_ConnectionFragment_to_RecordingsFragment)
+        }) {
+            Text("Recording")
+        }
     }
 }
 
