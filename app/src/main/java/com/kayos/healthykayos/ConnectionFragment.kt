@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import com.kayos.healthykayos.R.id.action_ConnectionFragment_to_RecordingsFragment
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.PolarHeartRateSensor
 import com.polar.sdk.api.model.PolarDeviceInfo
@@ -48,14 +49,10 @@ class ConnectionFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
-                    Column(modifier = Modifier.padding(16.dp)){
                         Connections(
-                            sensor
+                            sensor,
+                            findNavController()
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Navigation(findNavController())
-                    }
-
                 }
             }
         }
@@ -69,20 +66,10 @@ class ConnectionFragment : Fragment() {
 }
 
 @Composable
-fun Navigation(navController: NavController) {
-    Column(modifier = Modifier.padding(16.dp)) {
-        Button(onClick = {
-            navController.navigate(R.id.action_ConnectionFragment_to_RecordingsFragment)
-        }) {
-            Text("Recording")
-        }
-    }
-}
-
-
-@Composable
-fun Connections(sensor: PolarHeartRateSensor) {
+fun Connections(sensor: PolarHeartRateSensor, navController: NavController) {
     val availableDevices = sensor.availableDevices.collectAsState().value
+    val connectedDevices = sensor.connectedDevices.collectAsState().value
+
     Column {
         Button(onClick = {
             sensor.search()
@@ -91,8 +78,18 @@ fun Connections(sensor: PolarHeartRateSensor) {
         }
         Column {
             availableDevices.forEach { device ->
-                DeviceItem(device, onClick =  { sensor.connect(device) })
+                DeviceItem(device, onClick = { sensor.connect(device) })
             }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Column(modifier = Modifier.padding(16.dp)) {
+            if (connectedDevices.isNotEmpty())
+                Button(onClick = {
+                    navController.navigate(action_ConnectionFragment_to_RecordingsFragment)
+                }) {
+                    Text("Recording")
+                }
         }
     }
 }

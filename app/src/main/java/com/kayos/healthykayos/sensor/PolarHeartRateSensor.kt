@@ -28,6 +28,8 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
     private val _availableDevices = MutableStateFlow<List<PolarDeviceInfo>>(emptyList())
     val availableDevices: StateFlow<List<PolarDeviceInfo>> get() = _availableDevices
 
+    private val _connectedDevices = MutableStateFlow<Set<PolarDeviceInfo>>(emptySet())
+    val connectedDevices: StateFlow<Set<PolarDeviceInfo>> get() = _connectedDevices
 
     // TODO: set this when specific device is connected, rethink sharing between fragments
     var selectedDeviceId : String? = null
@@ -66,6 +68,7 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
             override fun deviceConnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
                 selectedDeviceId = polarDeviceInfo.deviceId
+                _connectedDevices.value = _connectedDevices.value + polarDeviceInfo
             }
 
             override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {
@@ -74,6 +77,7 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
 
             override fun deviceDisconnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.deviceId}")
+                _connectedDevices.value = _connectedDevices.value - polarDeviceInfo
             }
 
             override fun disInformationReceived(
@@ -103,6 +107,7 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
             }
         })
     }
+
     override fun search() {
         api.setPolarFilter(true);
 
