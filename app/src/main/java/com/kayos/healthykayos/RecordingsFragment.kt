@@ -51,7 +51,7 @@ class RecordingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<Button>(R.id.button_second).setOnClickListener {
-            findNavController().navigate(R.id.action_RecordingsFragment_to_FirstFragment)
+            findNavController().navigate(R.id.action_RecordingsFragment_to_ConnectionFragment)
         }
     }
 
