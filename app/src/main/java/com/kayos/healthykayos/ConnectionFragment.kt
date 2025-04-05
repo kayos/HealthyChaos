@@ -1,7 +1,6 @@
 package com.kayos.healthykayos
 
 import android.os.Bundle
-import android.view.InputDevice
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -29,15 +28,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.PolarHeartRateSensor
 import com.polar.sdk.api.model.PolarDeviceInfo
 
-/**
- * A simple [Fragment] subclass as the default destination in the navigation.
- */
 class ConnectionFragment : Fragment() {
 
     private val sensor: PolarHeartRateSensor by lazy {
@@ -56,23 +51,20 @@ class ConnectionFragment : Fragment() {
             setContent {
                 MaterialTheme {
                         Connections(
-                            sensor,
-                            findNavController()
-                        )
+                            sensor
+                        ) {
+                            findNavController().navigate(R.id.action_ConnectionFragment_to_RecordingsFragment)
+                        }
                 }
             }
         }
         return view
     }
 
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
 }
 
 @Composable
-fun Connections(sensor: PolarHeartRateSensor, navController: NavController) {
+fun Connections(sensor: PolarHeartRateSensor, onRecordingsClick: () -> Unit) {
     val availableDevices = sensor.availableDevices.collectAsState().value
     val connectedDevice = sensor.connectedDevices.collectAsState().value
 
@@ -90,11 +82,9 @@ fun Connections(sensor: PolarHeartRateSensor, navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         if (connectedDevice != null)
-            Device(connectedDevice) {
-                navController.navigate(R.id.action_ConnectionFragment_to_RecordingsFragment)
-            }
+            Device(connectedDevice, onRecordingsClick)
     }
-    }
+}
 
 @Composable
 fun Device(device: PolarDeviceInfo, onRecordingsClick: () -> Unit) {
@@ -107,7 +97,6 @@ fun Device(device: PolarDeviceInfo, onRecordingsClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Battery and Connection Status
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text("Signal strength: ${device.rssi}", style = MaterialTheme.typography.bodyMedium)
         }
