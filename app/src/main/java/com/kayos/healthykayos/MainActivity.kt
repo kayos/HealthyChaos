@@ -65,7 +65,6 @@ class MainActivity : AppCompatActivity() {
         HeartRateProviderFactory.getPolarHeartRateSensor(applicationContext)
     }
 
-    private var scanDisposable: Disposable? = null
     private var hrDisposable: Disposable? = null
     private var accDisposable: Disposable? = null
     private var gyrDisposable: Disposable? = null
@@ -77,7 +76,6 @@ class MainActivity : AppCompatActivity() {
     private var bluetoothEnabled = false
 
     private lateinit var connectButton: Button
-    private lateinit var scanButton: Button
     private lateinit var hrButton: Button
     private lateinit var accButton: Button
     private lateinit var gyrButton: Button
@@ -98,7 +96,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Log.d(TAG, "version: " + PolarBleApiDefaultImpl.versionInfo())
         connectButton = findViewById(R.id.connect_button)
-        scanButton = findViewById(R.id.scan_button)
         hrButton = findViewById(R.id.hr_button)
         accButton = findViewById(R.id.acc_button)
         gyrButton = findViewById(R.id.gyr_button)
@@ -197,17 +194,6 @@ class MainActivity : AppCompatActivity() {
                     "connect"
                 }
                 Log.e(TAG, "Failed to $attempt. Reason $polarInvalidArgument ")
-            }
-        }
-
-        scanButton.setOnClickListener {
-            val isDisposed = scanDisposable?.isDisposed ?: true
-            if (isDisposed) {
-                toggleButtonDown(scanButton, R.string.scanning_devices)
-               sensor.search()
-
-            } else {
-                toggleButtonUp(scanButton, "Scan devices")
             }
         }
 
@@ -610,7 +596,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun disableAllButtons() {
         connectButton.isEnabled = false
-        scanButton.isEnabled = false
         accButton.isEnabled = false
         gyrButton.isEnabled = false
         magButton.isEnabled = false
@@ -625,7 +610,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun enableAllButtons() {
         connectButton.isEnabled = true
-        scanButton.isEnabled = true
         accButton.isEnabled = true
         gyrButton.isEnabled = true
         magButton.isEnabled = true
