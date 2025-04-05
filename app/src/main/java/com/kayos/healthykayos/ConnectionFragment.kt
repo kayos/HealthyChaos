@@ -6,18 +6,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.PolarHeartRateSensor
+import com.polar.sdk.api.model.PolarDeviceInfo
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -39,7 +47,9 @@ class ConnectionFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
-                    Connections(sensor)
+                    Connections(
+                        sensor
+                    )
                 }
             }
         }
@@ -71,8 +81,31 @@ fun Connections(sensor: PolarHeartRateSensor) {
         }
         Column {
             availableDevices.forEach { device ->
-                Text(device.deviceId, color = Color.White)
+                DeviceItem(device, onClick =  { sensor.connect(device) })
             }
         }
+    }
+}
+
+@Composable
+fun DeviceItem(device: PolarDeviceInfo, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        ListItem(
+            modifier = Modifier.padding(16.dp),
+            headlineContent = {
+                Text(text = device.name, style = MaterialTheme.typography.bodyLarge)
+            },
+            supportingContent = {
+                Text(text = "Id: ${device.deviceId} | Address: ${device.address}", style = MaterialTheme.typography.bodyMedium)
+            }
+        )
     }
 }
