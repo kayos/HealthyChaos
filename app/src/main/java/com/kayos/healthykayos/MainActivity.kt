@@ -5,51 +5,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.util.Pair
-import android.view.View
-import android.widget.Button
 import android.widget.Toast
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.Button
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.DrawableCompat
-import com.google.android.material.snackbar.Snackbar
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.PolarHeartRateSensor
-import com.polar.androidcommunications.api.ble.model.DisInfo
-import com.polar.sdk.api.PolarBleApi
-import com.polar.sdk.api.PolarBleApiCallback
 import com.polar.sdk.api.PolarBleApiDefaultImpl
-import com.polar.sdk.api.errors.PolarInvalidArgument
-import com.polar.sdk.api.model.PolarAccelerometerData
-import com.polar.sdk.api.model.PolarDeviceInfo
-import com.polar.sdk.api.model.PolarGyroData
-import com.polar.sdk.api.model.PolarHealthThermometerData
-import com.polar.sdk.api.model.PolarHrData
-import com.polar.sdk.api.model.PolarMagnetometerData
-import com.polar.sdk.api.model.PolarOfflineRecordingData
-import com.polar.sdk.api.model.PolarOfflineRecordingEntry
-import com.polar.sdk.api.model.PolarPpgData
-import com.polar.sdk.api.model.PolarPpiData
-import com.polar.sdk.api.model.PolarRecordingSecret
-import com.polar.sdk.api.model.PolarSensorSetting
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.Disposable
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -57,9 +17,6 @@ class MainActivity : AppCompatActivity() {
         private const val API_LOGGER_TAG = "API LOGGER"
         private const val PERMISSION_REQUEST_CODE = 1
     }
-
-    // ATTENTION! Replace with the device ID from your device.
-    private var deviceId = ""
 
     private val sensor: PolarHeartRateSensor by lazy {
         HeartRateProviderFactory.getPolarHeartRateSensor(applicationContext)
@@ -69,11 +26,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.d(TAG, "version: " + PolarBleApiDefaultImpl.versionInfo())
-
-        //---------------------------
-
-        sensor.api.setPolarFilter(false)
-        sensor.selectedDeviceId = deviceId
 
         // If there is need to log what is happening inside the SDK, it can be enabled like this:
         val enableSdkLogs = false
