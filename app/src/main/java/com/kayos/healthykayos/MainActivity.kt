@@ -81,56 +81,6 @@ class MainActivity : AppCompatActivity() {
             sensor.api.setApiLogger { s: String -> Log.d(API_LOGGER_TAG, s) }
         }
 
-        sensor.api.setApiCallback(object : PolarBleApiCallback() {
-            override fun blePowerStateChanged(powered: Boolean) {
-                Log.d(TAG, "BLE power: $powered")
-                if (powered) {
-                    showToast("Phone Bluetooth on")
-                } else {
-                    showToast("Phone Bluetooth off")
-                }
-            }
-
-            override fun deviceConnected(polarDeviceInfo: PolarDeviceInfo) {
-                Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
-                deviceId = polarDeviceInfo.deviceId
-            }
-
-            override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {
-                Log.d(TAG, "CONNECTING: ${polarDeviceInfo.deviceId}")
-            }
-
-            override fun deviceDisconnected(polarDeviceInfo: PolarDeviceInfo) {
-                Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.deviceId}")
-            }
-
-            override fun disInformationReceived(
-                identifier: String,
-                disInfo: DisInfo
-            ) {
-                TODO("Not yet implemented")
-            }
-
-            override fun disInformationReceived(identifier: String, uuid: UUID, value: String) {
-                Log.d(TAG, "DIS INFO uuid: $uuid value: $value")
-            }
-
-            override fun batteryLevelReceived(identifier: String, level: Int) {
-                Log.d(TAG, "BATTERY LEVEL: $level")
-            }
-
-            override fun hrNotificationReceived(identifier: String, data: PolarHrData.PolarHrSample) {
-                // deprecated
-            }
-
-            override fun htsNotificationReceived(
-                identifier: String,
-                data: PolarHealthThermometerData
-            ) {
-                TODO("Not yet implemented")
-            }
-        })
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT), PERMISSION_REQUEST_CODE)

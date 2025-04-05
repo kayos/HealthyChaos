@@ -2,9 +2,12 @@ package com.kayos.healthykayos.sensor
 
 import android.content.Context
 import android.util.Log
+import com.polar.androidcommunications.api.ble.model.DisInfo
 import com.polar.sdk.api.PolarBleApi
+import com.polar.sdk.api.PolarBleApiCallback
 import com.polar.sdk.api.PolarBleApiDefaultImpl
 import com.polar.sdk.api.model.PolarDeviceInfo
+import com.polar.sdk.api.model.PolarHealthThermometerData
 import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -13,6 +16,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.util.UUID
 
 class PolarHeartRateSensor private constructor(context: Context): IHeartRateSensor {
 
@@ -53,6 +57,52 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
             }
     }
 
+    init {
+        api.setApiCallback(object : PolarBleApiCallback() {
+            override fun blePowerStateChanged(powered: Boolean) {
+                Log.d(TAG, "BLE power: $powered")
+            }
+
+            override fun deviceConnected(polarDeviceInfo: PolarDeviceInfo) {
+                Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
+                selectedDeviceId = polarDeviceInfo.deviceId
+            }
+
+            override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {
+                Log.d(TAG, "CONNECTING: ${polarDeviceInfo.deviceId}")
+            }
+
+            override fun deviceDisconnected(polarDeviceInfo: PolarDeviceInfo) {
+                Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.deviceId}")
+            }
+
+            override fun disInformationReceived(
+                identifier: String,
+                disInfo: DisInfo
+            ) {
+                TODO("Not yet implemented")
+            }
+
+            override fun disInformationReceived(identifier: String, uuid: UUID, value: String) {
+                Log.d(TAG, "DIS INFO uuid: $uuid value: $value")
+            }
+
+            override fun batteryLevelReceived(identifier: String, level: Int) {
+                Log.d(TAG, "BATTERY LEVEL: $level")
+            }
+
+            override fun hrNotificationReceived(identifier: String, data: PolarHrData.PolarHrSample) {
+                // deprecated
+            }
+
+            override fun htsNotificationReceived(
+                identifier: String,
+                data: PolarHealthThermometerData
+            ) {
+                TODO("Not yet implemented")
+            }
+        })
+    }
     override fun search() {
         api.setPolarFilter(true);
 
