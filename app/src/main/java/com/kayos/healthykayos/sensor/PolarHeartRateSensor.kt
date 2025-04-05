@@ -62,11 +62,15 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
             .subscribeBy(
                 onNext = {  polarDeviceInfo: PolarDeviceInfo ->
                     _availableDevices.value = _availableDevices.value + polarDeviceInfo
+                    Log.d(TAG, "Found Device: ${polarDeviceInfo.name}")
                 },
                 onError = { error: Throwable ->
                     Log.e(TAG, "Failed to search: $error")
                 },
-                onComplete = { searchDisposable?.dispose() }
+                onComplete = {
+                    searchDisposable?.dispose()
+                    Log.d(TAG, "Done searching for devices")
+                }
             )
     }
 
@@ -93,11 +97,15 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
             .subscribeBy(
                 onNext = { recording: PolarOfflineRecordingEntry ->
                     _recordings.value = _recordings.value + recording
+                    Log.d(TAG, "Found: ${recording.date}")
                 },
                 onError = { error: Throwable ->
                     Log.e(TAG, "Failed to list recordings: $error")
                 },
-                onComplete = { recordingDisposable?.dispose() }
+                onComplete = {
+                    recordingDisposable?.dispose()
+                    Log.d(TAG, "Done searching for recordings")
+                }
             )
     }
 
