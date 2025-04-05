@@ -26,12 +26,6 @@
             android:layout_marginBottom="2dp"
             android:background="@android:color/white" />
 
-        <Button
-            android:id="@+id/connect_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/connect_to_device" />
-
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

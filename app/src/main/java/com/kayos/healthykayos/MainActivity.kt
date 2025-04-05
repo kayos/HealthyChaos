@@ -75,7 +75,6 @@ class MainActivity : AppCompatActivity() {
     private var deviceConnected = false
     private var bluetoothEnabled = false
 
-    private lateinit var connectButton: Button
     private lateinit var hrButton: Button
     private lateinit var accButton: Button
     private lateinit var gyrButton: Button
@@ -95,7 +94,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.d(TAG, "version: " + PolarBleApiDefaultImpl.versionInfo())
-        connectButton = findViewById(R.id.connect_button)
         hrButton = findViewById(R.id.hr_button)
         accButton = findViewById(R.id.acc_button)
         gyrButton = findViewById(R.id.gyr_button)
@@ -137,8 +135,6 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
                 deviceId = polarDeviceInfo.deviceId
                 deviceConnected = true
-                val buttonText = getString(R.string.disconnect_from_device, deviceId)
-                toggleButtonDown(connectButton, buttonText)
             }
 
             override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {
@@ -148,8 +144,6 @@ class MainActivity : AppCompatActivity() {
             override fun deviceDisconnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.deviceId}")
                 deviceConnected = false
-                val buttonText = getString(R.string.connect_to_device, deviceId)
-                toggleButtonUp(connectButton, buttonText)
             }
 
             override fun disInformationReceived(
@@ -178,24 +172,6 @@ class MainActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
         })
-
-        connectButton.text = getString(R.string.connect_to_device, deviceId)
-        connectButton.setOnClickListener {
-            try {
-                if (deviceConnected) {
-                    sensor.disconnect(deviceId)
-                } else {
-                    sensor.connect(deviceId)
-                }
-            } catch (polarInvalidArgument: PolarInvalidArgument) {
-                val attempt = if (deviceConnected) {
-                    "disconnect"
-                } else {
-                    "connect"
-                }
-                Log.e(TAG, "Failed to $attempt. Reason $polarInvalidArgument ")
-            }
-        }
 
         hrButton.setOnClickListener {
             val isDisposed = hrDisposable?.isDisposed ?: true
@@ -595,7 +571,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun disableAllButtons() {
-        connectButton.isEnabled = false
         accButton.isEnabled = false
         gyrButton.isEnabled = false
         magButton.isEnabled = false
@@ -609,7 +584,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun enableAllButtons() {
-        connectButton.isEnabled = true
         accButton.isEnabled = true
         gyrButton.isEnabled = true
         magButton.isEnabled = true
