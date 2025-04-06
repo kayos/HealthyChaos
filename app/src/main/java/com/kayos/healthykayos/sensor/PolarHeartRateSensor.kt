@@ -162,6 +162,7 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
 
     override fun listRecordings(id: String) {
         recordingDisposable?.dispose()
+        _recordings.value = emptyList()
         recordingDisposable = api.listOfflineRecordings(id)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
