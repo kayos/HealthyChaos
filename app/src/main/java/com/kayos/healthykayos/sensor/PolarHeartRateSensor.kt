@@ -25,6 +25,7 @@ import java.util.UUID
 class PolarHeartRateSensor private constructor(context: Context): IHeartRateSensor {
 
     private  var recordingDisposable : Disposable? = null
+    private  var deleteDisposable : Disposable? = null
     private val _recordings = MutableStateFlow<List<PolarOfflineRecordingEntry>>(emptyList())
     val recordings: StateFlow<List<PolarOfflineRecordingEntry>> get() = _recordings
 
@@ -174,6 +175,22 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
                 onComplete = {
                     recordingDisposable?.dispose()
                     Log.d(TAG, "Done searching for recordings")
+                }
+            )
+    }
+
+    fun deleteRecording(deviceId: String, entry: PolarOfflineRecordingEntry) {
+        deleteDisposable?.dispose()
+        deleteDisposable = api.removeOfflineRecord(deviceId, entry)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error: Throwable ->
+                    Log.e(TAG, "Failed to delete recording: $error")
+                },
+                onComplete = {
+                    _recordings.value = _recordings.value - entry
+                    deleteDisposable?.dispose()
+                    Log.d(TAG, "Done deleting recording")
                 }
             )
     }

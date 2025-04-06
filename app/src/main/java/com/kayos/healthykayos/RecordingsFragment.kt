@@ -14,15 +14,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -36,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
@@ -89,7 +86,7 @@ class RecordingsFragment : Fragment() {
 
 @Composable
 fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
-    val recordings = sensor.recordings.collectAsState().value
+    val recordings = sensor.recordings.collectAsState().value.sortedBy { entry -> entry.date }
     val isRecording = remember { mutableStateOf(false) }
 
     // TODO start stop is leaking subscriptions - FIX
@@ -181,14 +178,21 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
                     recording,
                     onDownloadClick = {
                         startDownload(recording)
-                    })
+                    },
+                    onDeleteClick = {
+                        sensor.deleteRecording(sensor.selectedDeviceId!!, recording)
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-fun RecordingItem(recording: PolarOfflineRecordingEntry, onDownloadClick: () -> Unit,) {
+fun RecordingItem(
+    recording: PolarOfflineRecordingEntry,
+    onDownloadClick: () -> Unit,
+    onDeleteClick: () -> Unit,) {
 
     Box(
         modifier = Modifier
@@ -216,8 +220,16 @@ fun RecordingItem(recording: PolarOfflineRecordingEntry, onDownloadClick: () -> 
                     )
                 },
                 trailingContent = {
+                    Row{
                     IconButton(onClick = onDownloadClick) {
                         Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Download")
+                    }
+                    IconButton(
+                        onClick = onDeleteClick,
+                        modifier = Modifier.padding(start = 8.dp)
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                    }
                     }
                 }
             )
