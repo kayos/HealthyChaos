@@ -114,7 +114,7 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
     }
 
     override fun search() {
-        // TODO clear existing available Devices before "re"scanning
+        _availableDevices.value = emptyList<PolarDeviceInfo>()
 
         api.setPolarFilter(true);
 
