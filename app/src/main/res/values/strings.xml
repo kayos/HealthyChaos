@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Polar BLE SDK Example</string>
+    <string name="app_name">HealthyKayos</string>
     <string name="disable_sdk_mode">Disable SDK mode</string>
     <string name="sampling_rate">Sampling rate</string>
     <string name="resolution">Resolution</string>
