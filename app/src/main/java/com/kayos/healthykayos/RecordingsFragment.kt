@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,8 +19,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
@@ -27,6 +29,8 @@ import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.PolarHeartRateSensor
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -49,7 +53,7 @@ class RecordingsFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
-                    Recordings(sensor, sensor.selectedDeviceId!!)
+                    RecordingsScreen(sensor, sensor.selectedDeviceId!!)
                 }
             }
         }
@@ -70,9 +74,62 @@ class RecordingsFragment : Fragment() {
 }
 
 @Composable
-fun Recordings(sensor: PolarHeartRateSensor, deviceId: String) {
+fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
     val recordings = sensor.recordings.collectAsState().value
+    val isRecording = remember { mutableStateOf(false) }
+
+    // TODO start stop is leaking subscriptions - FIX
+    fun startRecording(selectedDeviceId: String) {
+        sensor.startRecording(selectedDeviceId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnComplete {
+                isRecording.value = true
+            }
+            .doOnError {
+                isRecording.value = false
+            }
+            .subscribe(
+                { },
+                {
+                    throwable ->
+                    //TODO fix logic around isRecording
+                    isRecording.value = true
+                    throwable.printStackTrace()
+            })
+    }
+
+    fun stopRecording(selectedDeviceId: String) {
+        sensor.stopRecording(selectedDeviceId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnComplete {
+                isRecording.value = false
+            }
+            .doOnError {
+                isRecording.value = true
+            }
+            .subscribe(
+                {  },
+                { throwable ->
+                    // Handle any error here explicitly
+                    isRecording.value = false
+                    // Log or process the error as needed
+                    throwable.printStackTrace() // Or use any other error logging mechanism
+                })
+    }
+
     Column {
+        Button(
+            onClick = { if (isRecording.value) stopRecording(sensor.selectedDeviceId!!) else startRecording(sensor.selectedDeviceId!!) },
+            modifier = Modifier.padding(bottom = 8.dp)
+        ) {
+            Text(text = if (isRecording.value) "Stop Recording" else "Start Recording")
+        }
+
+        Text(text = if (isRecording.value) "Recording..." else "Not Recording")
+
+        Spacer(modifier = Modifier.padding(horizontal = 8.dp))
         Button(onClick = {
             sensor.listRecordings(deviceId)
         }) {
