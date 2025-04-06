@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.PolarHeartRateSensor
-import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -166,7 +165,7 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
                 })
     }
 
-    fun startDownload(recording: PolarOfflineRecordingEntry) {
+    fun download(recording: PolarOfflineRecordingEntry) {
          sensor.downloadRecording(sensor.selectedDeviceId!!, recording)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -207,7 +206,7 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
                 RecordingItem(
                     recording,
                     onDownloadClick = {
-                        startDownload(recording)
+                        download(recording)
                     },
                     onDeleteClick = {
                         sensor.deleteRecording(sensor.selectedDeviceId!!, recording)
