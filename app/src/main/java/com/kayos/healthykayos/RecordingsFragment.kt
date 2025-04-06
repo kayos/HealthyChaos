@@ -1,6 +1,7 @@
 package com.kayos.healthykayos
 
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -33,15 +34,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.PolarHeartRateSensor
+import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -84,10 +91,39 @@ class RecordingsFragment : Fragment() {
     }
 }
 
+
 @Composable
 fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
     val recordings = sensor.recordings.collectAsState().value.sortedBy { entry -> entry.date }
     val isRecording = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    fun saveDataToCSV(data : PolarOfflineRecordingData.HrOfflineRecording) {
+        if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
+            val filePath = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "polar-${data.startTime.time}.csv")
+            val fileWriter: FileWriter
+            val bufferedWriter: BufferedWriter
+            try {
+                fileWriter = FileWriter(filePath)
+                bufferedWriter = BufferedWriter(fileWriter)
+
+                bufferedWriter.write("time,hr,correctedHr")
+                bufferedWriter.newLine()
+
+                for (sample in data.data.samples) {
+                    bufferedWriter.write("${data.startTime.time},${sample.hr},${sample.correctedHr}")
+                    bufferedWriter.newLine()
+                }
+                bufferedWriter.flush()
+                bufferedWriter.close()
+                Log.d("RecordingsFragment", "Done saving to file: $filePath")
+            } catch (e: IOException) {
+                Log.e("RecordingsFragment", "Error saving. ${e.message}")
+            }
+        } else {
+            Log.e("RecordingsFragment", "External storage is not available")
+        }
+    }
 
     // TODO start stop is leaking subscriptions - FIX
     fun startRecording(selectedDeviceId: String) {
@@ -138,14 +174,8 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
                 { data: PolarOfflineRecordingData ->
                     when (data) {
                         is PolarOfflineRecordingData.HrOfflineRecording -> {
-                            for (sample in data.data.samples) {
-                                Log.d(
-                                    "RecordingsFragment",
-                                    "HR data: HR: ${sample.hr}"
-                                )
-                            }
+                            saveDataToCSV(data)
                         }
-
                         else -> {
                             Log.d("RecordingsFragment", "Recording type is not yet implemented")
                         }
