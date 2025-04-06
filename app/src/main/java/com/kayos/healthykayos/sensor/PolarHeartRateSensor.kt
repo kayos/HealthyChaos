@@ -9,10 +9,13 @@ import com.polar.sdk.api.PolarBleApiDefaultImpl
 import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHealthThermometerData
 import com.polar.sdk.api.model.PolarHrData
+import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
+import com.polar.sdk.api.model.PolarSensorSetting
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -150,6 +153,10 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
 
     override fun stopRecording(id: String): Completable {
         return api.stopOfflineRecording(id, PolarBleApi.PolarDeviceDataType.HR)
+    }
+
+    override fun downloadRecording(deviceId: String, recording: PolarOfflineRecordingEntry): Single<PolarOfflineRecordingData> {
+        return api.getOfflineRecord(deviceId, recording)
     }
 
     override fun listRecordings(id: String) {
