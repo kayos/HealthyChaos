@@ -39,6 +39,8 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
     // TODO: set this when specific device is connected, rethink sharing between fragments
     var selectedDeviceId : String? = null
 
+    val hrSampleRateSec = 1
+
     //TODO make private once refactor is done
     val api: PolarBleApi = PolarBleApiDefaultImpl.defaultImplementation(
             context,

@@ -48,6 +48,7 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
+import java.util.Calendar
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -109,8 +110,10 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
                 bufferedWriter.write("time,hr,correctedHr")
                 bufferedWriter.newLine()
 
+                var start = data.startTime
                 for (sample in data.data.samples) {
-                    bufferedWriter.write("${data.startTime.time},${sample.hr},${sample.correctedHr}")
+                    start.add(Calendar.SECOND, sensor.hrSampleRateSec)
+                    bufferedWriter.write("${start.time},${sample.hr},${sample.correctedHr}")
                     bufferedWriter.newLine()
                 }
                 bufferedWriter.flush()
