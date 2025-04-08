@@ -51,20 +51,15 @@ fun LiveHeartRateScreen(heartRate: Int){
             .fillMaxWidth()
             .padding(8.dp),
             horizontalArrangement = Arrangement.Center) {
-            //      if (heartRate != null) {
+
             Text(
                 text = "$heartRate",
                 style = TextStyle(fontSize = 32.sp, color = Yellow)
             )
-//        } else {
-//            Text(text = "Waiting for heart rate data...", style = TextStyle(fontSize = 18.sp))
-//        },
-
             Text(
                 text = "bpm",
                 style = TextStyle(fontSize = 24.sp, color = Green)
             )
-
         }
 
         Spacer(modifier = Modifier.padding(8.dp))

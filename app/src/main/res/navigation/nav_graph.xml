@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_ConnectionFragment_to_RecordingsFragment"
             app:destination="@id/RecordingsFragment" />
+        <action
+            android:id="@+id/action_ConnectionFragment_to_HeartRateStreamFragment"
+            app:destination="@id/heartRateStreamFragment" />
     </fragment>
     <fragment
         android:id="@+id/RecordingsFragment"
@@ -25,4 +28,8 @@
             android:id="@+id/action_RecordingsFragment_to_ConnectionFragment"
             app:destination="@id/ConnectionFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/heartRateStreamFragment"
+        android:name="com.kayos.healthykayos.HeartRateStreamFragment"
+        android:label="HeartRateStreamFragment" />
 </navigation>

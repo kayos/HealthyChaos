@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
@@ -50,11 +51,15 @@ class ConnectionFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
-                        Connections(
-                            sensor
-                        ) {
+                    Connections(
+                        sensor,
+                        onRecordingsClick = {
                             findNavController().navigate(R.id.action_ConnectionFragment_to_RecordingsFragment)
-                        }
+                        },
+                        onLiveClick = {
+                            findNavController().navigate(R.id.action_ConnectionFragment_to_HeartRateStreamFragment)
+                        },
+                    )
                 }
             }
         }
@@ -64,7 +69,11 @@ class ConnectionFragment : Fragment() {
 }
 
 @Composable
-fun Connections(sensor: PolarHeartRateSensor, onRecordingsClick: () -> Unit) {
+fun Connections(
+    sensor: PolarHeartRateSensor,
+    onRecordingsClick: () -> Unit,
+    onLiveClick: () -> Unit)
+{
     val availableDevices = sensor.availableDevices.collectAsState().value
     val connectedDevice = sensor.connectedDevices.collectAsState().value
 
@@ -82,12 +91,12 @@ fun Connections(sensor: PolarHeartRateSensor, onRecordingsClick: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         if (connectedDevice != null)
-            Device(connectedDevice, onRecordingsClick)
+            Device(connectedDevice, onRecordingsClick, onLiveClick)
     }
 }
 
 @Composable
-fun Device(device: PolarDeviceInfo, onRecordingsClick: () -> Unit) {
+fun Device(device: PolarDeviceInfo, onRecordingsClick: () -> Unit, onLiveClick: () -> Unit) {
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)
@@ -103,12 +112,21 @@ fun Device(device: PolarDeviceInfo, onRecordingsClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(
-            onClick = onRecordingsClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Recordings")
+        Column {
+            Button(
+                onClick = onRecordingsClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Recordings")
+            }
+            Button(
+                onClick = onLiveClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Live HR")
+            }
         }
+
     }
 }
 
