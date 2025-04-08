@@ -4,13 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Green
+import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.TextStyle
@@ -40,11 +46,26 @@ fun LiveHeartRateScreen(heartRate: Int){
 
         Spacer(modifier = Modifier.padding(8.dp))
 
-  //      if (heartRate != null) {
-            Text(text = "Heart Rate: $heartRate bpm", style = TextStyle(fontSize = 24.sp))
+        Row(
+            modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+            horizontalArrangement = Arrangement.Center) {
+            //      if (heartRate != null) {
+            Text(
+                text = "$heartRate",
+                style = TextStyle(fontSize = 32.sp, color = Yellow)
+            )
 //        } else {
 //            Text(text = "Waiting for heart rate data...", style = TextStyle(fontSize = 18.sp))
-//        }
+//        },
+
+            Text(
+                text = "bpm",
+                style = TextStyle(fontSize = 24.sp, color = Green)
+            )
+
+        }
 
         Spacer(modifier = Modifier.padding(8.dp))
         Button(onClick = { /* Add actions like connecting or pausing */ }) {
