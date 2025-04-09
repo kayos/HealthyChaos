@@ -13,19 +13,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 
 class HeartRateStreamFragment : Fragment() {
+
+    private val viewModel: LiveHeartRateViewModel by viewModels {
+        LiveHeartRateViewModel.Factory }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,43 +38,50 @@ class HeartRateStreamFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                LiveHeartRateScreen(34)
+                LiveHeartRateScreen(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun LiveHeartRateScreen(heartRate: Int){
+fun LiveHeartRateScreen(viewModel: LiveHeartRateViewModel)
+{
+    val sample = viewModel.heartRate.collectAsStateWithLifecycle()
+
     Column(modifier = Modifier.padding(16.dp)) {
 
         Spacer(modifier = Modifier.padding(8.dp))
 
         Row(
             modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-            horizontalArrangement = Arrangement.Center) {
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (sample.value != null) {
+                Text(
+                    text = "${sample.value?.bpm}",
+                    style = TextStyle(fontSize = 32.sp, color = Yellow)
+                )
+                Text(
+                    text = "bpm",
+                    style = TextStyle(fontSize = 24.sp, color = Green)
+                )
+            }
 
-            Text(
-                text = "$heartRate",
-                style = TextStyle(fontSize = 32.sp, color = Yellow)
-            )
-            Text(
-                text = "bpm",
-                style = TextStyle(fontSize = 24.sp, color = Green)
-            )
         }
 
         Spacer(modifier = Modifier.padding(8.dp))
-        Button(onClick = { /* Add actions like connecting or pausing */ }) {
-            Text("Start Monitoring")
+
+        if (sample.value == null) {
+            Button(onClick = { viewModel.startStreaming() }) {
+                Text("Start Monitoring")
+            }
+        } else {
+            Button(onClick = { viewModel.stopStreaming() }) {
+                Text("Stop Monitoring")
+            }
         }
     }
-}
-
-@Preview
-@Composable
-fun PreviewHeartRateScreen() {
-    LiveHeartRateScreen(heartRate = 72)
 }

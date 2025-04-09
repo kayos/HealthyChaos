@@ -20,6 +20,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.Instant
 import java.util.UUID
 
 class PolarHeartRateSensor private constructor(context: Context): IHeartRateSensor {
@@ -35,6 +36,10 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
 
     private val _connectedDevices = MutableStateFlow<PolarDeviceInfo?>(null)
     val connectedDevices: StateFlow<PolarDeviceInfo?> get() = _connectedDevices
+
+    private var heartRateDisposable : Disposable? = null
+    private val _heartRate = MutableStateFlow<HeartRate?>(null)
+    override val heartRate: StateFlow<HeartRate?> get() = _heartRate
 
     // TODO: set this when specific device is connected, rethink sharing between fragments
     var selectedDeviceId : String? = null
@@ -160,6 +165,29 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
 
     override fun downloadRecording(deviceId: String, recording: PolarOfflineRecordingEntry): Single<PolarOfflineRecordingData> {
         return api.getOfflineRecord(deviceId, recording)
+    }
+
+    override fun startHeartRateStream() {
+       heartRateDisposable?.dispose()
+       heartRateDisposable = api.startHrStreaming(selectedDeviceId!!)
+           .flatMap{data -> Flowable.fromIterable(data.samples)}
+           .map{sample -> HeartRate(Instant.now(), sample.hr)}
+           .subscribeBy(
+               onNext = {  heartRate: HeartRate ->
+                   _heartRate.value = heartRate
+               },
+               onError = { error: Throwable ->
+                   Log.e(TAG, "Failed streaming heart rate: $error")
+               },
+               onComplete = {
+                   Log.d(TAG, "Done streaming heart rate")
+               }
+           )
+    }
+
+    override fun stopHeartRateStream() {
+        heartRateDisposable?.dispose()
+        _heartRate.value = null
     }
 
     override fun listRecordings(id: String) {
