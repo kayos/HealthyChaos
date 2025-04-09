@@ -110,10 +110,10 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
                 bufferedWriter.write("time,hr,correctedHr")
                 bufferedWriter.newLine()
 
-                var start = data.startTime
+                var timestamp = data.startTime
                 for (sample in data.data.samples) {
-                    start.add(Calendar.SECOND, sensor.hrSampleRateSec)
-                    bufferedWriter.write("${start.time},${sample.hr},${sample.correctedHr}")
+                    timestamp.add(Calendar.SECOND, sensor.hrSampleRateSec)
+                    bufferedWriter.write("${timestamp.time},${sample.hr},${sample.correctedHr}")
                     bufferedWriter.newLine()
                 }
                 bufferedWriter.flush()
