@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,11 +63,13 @@ fun LiveHeartRateScreen(viewModel: LiveHeartRateViewModel)
             if (sample.value != null) {
                 Text(
                     text = "${sample.value?.bpm}",
-                    style = TextStyle(fontSize = 32.sp, color = Yellow)
+                    style = TextStyle(fontSize = 32.sp, color = Yellow),
+                    modifier = Modifier.testTag("test-hr-text")
                 )
                 Text(
                     text = "bpm",
-                    style = TextStyle(fontSize = 24.sp, color = Green)
+                    style = TextStyle(fontSize = 24.sp, color = Green),
+                    modifier = Modifier.testTag("test-bpm-text")
                 )
             }
 
