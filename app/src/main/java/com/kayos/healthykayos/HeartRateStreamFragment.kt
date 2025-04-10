@@ -1,5 +1,6 @@
 package com.kayos.healthykayos
 
+import androidx.compose.runtime.getValue
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Green
@@ -25,11 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kayos.healthykayos.sensor.HeartRate
 
 class HeartRateStreamFragment : Fragment() {
-
-    private val viewModel: LiveHeartRateViewModel by viewModels {
-        LiveHeartRateViewModel.Factory }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,16 +41,32 @@ class HeartRateStreamFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                LiveHeartRateScreen(viewModel)
+                LiveHeartRateScreen()
             }
         }
     }
 }
 
 @Composable
-fun LiveHeartRateScreen(viewModel: LiveHeartRateViewModel)
+private fun LiveHeartRateScreen(
+    viewModel: LiveHeartRateViewModel = viewModel(factory = LiveHeartRateViewModel.Factory)
+) {
+
+    val heartRate by viewModel.heartRate.collectAsStateWithLifecycle()
+
+    LiveHeartRateScreen(
+        sample = heartRate,
+        onStartMonitoringClick = { viewModel.startStreaming() },
+        onStopMonitoringClick = { viewModel.stopStreaming() }
+    )
+}
+
+@Composable
+fun LiveHeartRateScreen(
+    sample: HeartRate?,
+    onStartMonitoringClick: () -> Unit,
+    onStopMonitoringClick: () -> Unit)
 {
-    val sample = viewModel.heartRate.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.padding(16.dp)) {
 
@@ -60,9 +78,9 @@ fun LiveHeartRateScreen(viewModel: LiveHeartRateViewModel)
                 .padding(8.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            if (sample.value != null) {
+            if (sample != null) {
                 Text(
-                    text = "${sample.value?.bpm}",
+                    text = "${sample?.bpm}",
                     style = TextStyle(fontSize = 32.sp, color = Yellow),
                     modifier = Modifier.testTag("test-hr-text")
                 )
@@ -77,13 +95,26 @@ fun LiveHeartRateScreen(viewModel: LiveHeartRateViewModel)
 
         Spacer(modifier = Modifier.padding(8.dp))
 
-        if (sample.value == null) {
-            Button(onClick = { viewModel.startStreaming() }) {
-                Text("Start Monitoring")
+        var isMonitoring = remember { mutableStateOf(false) }
+
+        if (isMonitoring.value) {
+            Button(
+                onClick = {
+                    onStopMonitoringClick()
+                    isMonitoring.value = false
+                },
+                modifier = Modifier.testTag("test-stop-monitoring-btn")
+            ) {
+                Text("Stop monitoring")
             }
-        } else {
-            Button(onClick = { viewModel.stopStreaming() }) {
-                Text("Stop Monitoring")
+        }
+        else{
+            Button(onClick = {
+                    onStartMonitoringClick()
+                    isMonitoring.value = true
+                 },
+                modifier = Modifier.testTag("test-start-monitoring-btn")) {
+                Text("Start monitoring")
             }
         }
     }
