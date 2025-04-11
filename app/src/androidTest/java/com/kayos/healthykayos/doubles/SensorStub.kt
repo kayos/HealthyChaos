@@ -11,7 +11,9 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.flow.StateFlow
 
-class SensorStub(override val heartRate: StateFlow<HeartRate?>) : IHeartRateSensor {
+class SensorStub(override val heartRate: StateFlow<HeartRate?>,
+                 override val recordings: StateFlow<List<PolarOfflineRecordingEntry>>
+) : IHeartRateSensor {
     override fun search() {
         TODO("Not yet implemented")
     }
@@ -28,24 +30,26 @@ class SensorStub(override val heartRate: StateFlow<HeartRate?>) : IHeartRateSens
         TODO("Not yet implemented")
     }
 
-    override fun listRecordings(id: String) {
+    override fun listRecordings() {
         TODO("Not yet implemented")
     }
 
-    override fun startRecording(deviceId: String): Completable {
+    override fun startRecording(): Completable {
         TODO("Not yet implemented")
     }
 
-    override fun stopRecording(id: String): Completable {
+    override fun stopRecording(): Completable {
         TODO("Not yet implemented")
     }
 
-    override fun downloadRecording(
-        deviceId: String,
-        recording: PolarOfflineRecordingEntry
-    ): Single<PolarOfflineRecordingData> {
+    override fun deleteRecording(entry: PolarOfflineRecordingEntry) {
         TODO("Not yet implemented")
     }
+
+    override fun downloadRecording(recording: PolarOfflineRecordingEntry): Single<PolarOfflineRecordingData> {
+        TODO("Not yet implemented")
+    }
+
 
     override fun startHeartRateStream() {
         TODO("Not yet implemented")

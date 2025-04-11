@@ -28,7 +28,7 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
     private  var recordingDisposable : Disposable? = null
     private  var deleteDisposable : Disposable? = null
     private val _recordings = MutableStateFlow<List<PolarOfflineRecordingEntry>>(emptyList())
-    val recordings: StateFlow<List<PolarOfflineRecordingEntry>> get() = _recordings
+    override val recordings: StateFlow<List<PolarOfflineRecordingEntry>> get() = _recordings
 
     private  var searchDisposable : Disposable? = null
     private val _availableDevices = MutableStateFlow<List<PolarDeviceInfo>>(emptyList())
@@ -155,16 +155,32 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
         return api.startHrStreaming(id)
     }
 
-    override fun startRecording(deviceId: String): Completable {
-        return api.startOfflineRecording(deviceId, PolarBleApi.PolarDeviceDataType.HR)
+    override fun startRecording(): Completable {
+        return api.startOfflineRecording(selectedDeviceId!!, PolarBleApi.PolarDeviceDataType.HR)
     }
 
-    override fun stopRecording(id: String): Completable {
-        return api.stopOfflineRecording(id, PolarBleApi.PolarDeviceDataType.HR)
+    override fun stopRecording(): Completable {
+        return api.stopOfflineRecording(selectedDeviceId!!, PolarBleApi.PolarDeviceDataType.HR)
     }
 
-    override fun downloadRecording(deviceId: String, recording: PolarOfflineRecordingEntry): Single<PolarOfflineRecordingData> {
-        return api.getOfflineRecord(deviceId, recording)
+    override fun deleteRecording(entry: PolarOfflineRecordingEntry) {
+        deleteDisposable?.dispose()
+        deleteDisposable = api.removeOfflineRecord(selectedDeviceId!!, entry)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error: Throwable ->
+                    Log.e(TAG, "Failed to delete recording: $error")
+                },
+                onComplete = {
+                    _recordings.value = _recordings.value - entry
+                    deleteDisposable?.dispose()
+                    Log.d(TAG, "Done deleting recording")
+                }
+            )
+    }
+
+    override fun downloadRecording(recording: PolarOfflineRecordingEntry): Single<PolarOfflineRecordingData> {
+        return api.getOfflineRecord(selectedDeviceId!!, recording)
     }
 
     override fun startHeartRateStream() {
@@ -190,10 +206,10 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
         _heartRate.value = null
     }
 
-    override fun listRecordings(id: String) {
+    override fun listRecordings() {
         recordingDisposable?.dispose()
         _recordings.value = emptyList()
-        recordingDisposable = api.listOfflineRecordings(id)
+        recordingDisposable = api.listOfflineRecordings(selectedDeviceId!!)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { recording: PolarOfflineRecordingEntry ->
@@ -206,22 +222,6 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
                 onComplete = {
                     recordingDisposable?.dispose()
                     Log.d(TAG, "Done searching for recordings")
-                }
-            )
-    }
-
-    fun deleteRecording(deviceId: String, entry: PolarOfflineRecordingEntry) {
-        deleteDisposable?.dispose()
-        deleteDisposable = api.removeOfflineRecord(deviceId, entry)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error: Throwable ->
-                    Log.e(TAG, "Failed to delete recording: $error")
-                },
-                onComplete = {
-                    _recordings.value = _recordings.value - entry
-                    deleteDisposable?.dispose()
-                    Log.d(TAG, "Done deleting recording")
                 }
             )
     }

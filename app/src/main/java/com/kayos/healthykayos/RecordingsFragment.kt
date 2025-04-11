@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
+import com.kayos.healthykayos.sensor.IHeartRateSensor
 import com.kayos.healthykayos.sensor.PolarHeartRateSensor
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
@@ -72,7 +73,7 @@ class RecordingsFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
-                    RecordingsScreen(sensor, sensor.selectedDeviceId!!)
+                    RecordingsScreen(sensor)
                 }
             }
         }
@@ -94,7 +95,7 @@ class RecordingsFragment : Fragment() {
 
 
 @Composable
-fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
+fun RecordingsScreen(sensor: IHeartRateSensor) {
     val recordings = sensor.recordings.collectAsState().value.sortedBy { entry -> entry.date }
     val isRecording = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -113,7 +114,7 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
 
                 var timestamp = data.startTime
                 for (sample in data.data.samples) {
-                    timestamp.add(Calendar.SECOND, sensor.hrSampleRateSec)
+                    timestamp.add(Calendar.SECOND, 1)
                     bufferedWriter.write("${timestamp.time},${sample.hr},${sample.correctedHr}")
                     bufferedWriter.newLine()
                 }
@@ -129,8 +130,8 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
     }
 
     // TODO start stop is leaking subscriptions - FIX
-    fun startRecording(selectedDeviceId: String) {
-        sensor.startRecording(selectedDeviceId)
+    fun startRecording() {
+        sensor.startRecording()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnComplete {
@@ -149,8 +150,8 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
             })
     }
 
-    fun stopRecording(selectedDeviceId: String) {
-        sensor.stopRecording(selectedDeviceId)
+    fun stopRecording() {
+        sensor.stopRecording()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnComplete {
@@ -170,7 +171,7 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
     }
 
     fun download(recording: PolarOfflineRecordingEntry) {
-         sensor.downloadRecording(sensor.selectedDeviceId!!, recording)
+         sensor.downloadRecording(recording)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -191,7 +192,7 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
 
     Column {
         Button(
-            onClick = { if (isRecording.value) stopRecording(sensor.selectedDeviceId!!) else startRecording(sensor.selectedDeviceId!!) },
+            onClick = { if (isRecording.value) stopRecording() else startRecording() },
             modifier = Modifier
                 .padding(bottom = 8.dp)
                 .testTag("test-record-btn")
@@ -204,7 +205,7 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
         Button(modifier = Modifier.testTag("test-refresh-recordings-btn"),
             onClick = {
-            sensor.listRecordings(deviceId)
+            sensor.listRecordings()
         }) {
             Text("Refresh")
         }
@@ -216,7 +217,7 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
                         download(recording)
                     },
                     onDeleteClick = {
-                        sensor.deleteRecording(sensor.selectedDeviceId!!, recording)
+                        sensor.deleteRecording(recording)
                     },
                     itemModifier = Modifier.testTag("test-reocringd-item-${recording.date.toString()}")
                 )
