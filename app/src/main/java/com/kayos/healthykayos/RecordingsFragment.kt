@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
@@ -191,7 +192,9 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
     Column {
         Button(
             onClick = { if (isRecording.value) stopRecording(sensor.selectedDeviceId!!) else startRecording(sensor.selectedDeviceId!!) },
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .testTag("test-record-btn")
         ) {
             Text(text = if (isRecording.value) "Stop Recording" else "Start Recording")
         }
@@ -199,7 +202,8 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
         Text(text = if (isRecording.value) "Recording..." else "Not Recording")
 
         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-        Button(onClick = {
+        Button(modifier = Modifier.testTag("test-refresh-recordings-btn"),
+            onClick = {
             sensor.listRecordings(deviceId)
         }) {
             Text("Refresh")
@@ -213,7 +217,8 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
                     },
                     onDeleteClick = {
                         sensor.deleteRecording(sensor.selectedDeviceId!!, recording)
-                    }
+                    },
+                    itemModifier = Modifier.testTag("test-reocringd-item-${recording.date.toString()}")
                 )
             }
         }
@@ -224,7 +229,8 @@ fun RecordingsScreen(sensor: PolarHeartRateSensor, deviceId: String) {
 fun RecordingItem(
     recording: PolarOfflineRecordingEntry,
     onDownloadClick: () -> Unit,
-    onDeleteClick: () -> Unit,) {
+    onDeleteClick: () -> Unit,
+    itemModifier: Modifier,) {
 
     Box(
         modifier = Modifier
@@ -238,7 +244,7 @@ fun RecordingItem(
                 .padding(16.dp)
         ) {
             ListItem(
-                modifier = Modifier.padding(4.dp),
+                modifier = itemModifier.padding(4.dp),
                 headlineContent = {
                     Text(
                         text = recording.date.toString(),
