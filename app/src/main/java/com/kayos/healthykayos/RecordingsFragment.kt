@@ -191,14 +191,27 @@ fun RecordingsScreen(sensor: IHeartRateSensor) {
     }
 
     Column {
-        Button(
-            onClick = { if (isRecording.value) stopRecording() else startRecording() },
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .testTag("test-record-btn")
-        ) {
-            Text(text = if (isRecording.value) "Stop Recording" else "Start Recording")
+        if (isRecording.value)
+        {
+            Button(
+                onClick = {  stopRecording()  },
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .testTag("test-stop-record-btn")
+            ) {
+                Text(text = "Stop Recording")
+            }
+        } else {
+            Button(
+                onClick = {  startRecording() },
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .testTag("test-start-record-btn")
+            ) {
+                Text(text = "Start Recording")
+            }
         }
+
 
         Text(text = if (isRecording.value) "Recording..." else "Not Recording")
 

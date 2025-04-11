@@ -35,7 +35,7 @@ class SensorStub(override val heartRate: StateFlow<HeartRate?>,
     }
 
     override fun startRecording(): Completable {
-        TODO("Not yet implemented")
+        return Completable.complete()
     }
 
     override fun stopRecording(): Completable {
