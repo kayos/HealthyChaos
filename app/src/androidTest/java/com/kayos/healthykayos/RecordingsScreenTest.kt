@@ -13,6 +13,7 @@ import com.kayos.healthykayos.sensor.IHeartRateSensor
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Rule
@@ -48,18 +49,25 @@ class RecordingsScreenTest {
             .assertDoesNotExist()
     }
 
-//    @Test
-//    fun recordingsScreen_whenStartClicked_StartsRecording() {
-//        composeTestRule.setContent {
-//            RecordingsScreen(
-//                sensor = SensorStub(
-//                    heartRate = MutableStateFlow(null),
-//                    recordings = MutableStateFlow(emptyList())
-//                )
-//            )
-//        }
-//
-//    }
+    @Test
+    fun recordingsScreen_whenStartClicked_StartsRecording() {
+        val mockSensor = mock<IHeartRateSensor>{
+            on { recordings } doReturn MutableStateFlow(emptyList())
+            on { startRecording() } doReturn Completable.complete()
+        }
+
+        composeTestRule.setContent {
+            RecordingsScreen(
+                sensor = mockSensor
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTag("test-start-record-btn")
+            .performClick()
+
+        verify(mockSensor).startRecording()
+    }
 
     @Test
     fun recordingsScreen_whenRecording_onlyStopRecordingAvailable() {
