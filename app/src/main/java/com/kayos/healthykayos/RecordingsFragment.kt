@@ -273,12 +273,15 @@ fun RecordingItem(
                 },
                 trailingContent = {
                     Row{
-                    IconButton(onClick = onDownloadClick, modifier = Modifier.testTag("test-recording-item-${index}-download-btn")) {
+                    IconButton(
+                        onClick = onDownloadClick,
+                        modifier = Modifier.testTag("test-recording-item-${index}-download-btn")) {
                         Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Download")
                     }
                     IconButton(
                         onClick = onDeleteClick,
                         modifier = Modifier.padding(start = 8.dp)
+                            .testTag("test-recording-item-${index}-delete-btn")
                     ) {
                         Icon(Icons.Default.Delete, contentDescription = "Delete")
                     }

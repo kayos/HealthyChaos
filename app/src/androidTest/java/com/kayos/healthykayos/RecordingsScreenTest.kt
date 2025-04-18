@@ -133,18 +133,24 @@ class RecordingsScreenTest {
         verify(mockSensor).downloadRecording(recording)
     }
 
-//    @Test
-//    fun recordingsScreen_onAvailableRecordings_deleteClicked_triggersDeletion() {
-//
-//        composeTestRule.setContent {
-//            RecordingsScreen(
-//                sensor = SensorStub(
-//                    heartRate = MutableStateFlow(null),
-//                    recordings = MutableStateFlow(emptyList())
-//                )
-//            )
-//        }
-//
-//    }
+    @Test
+    fun recordingsScreen_onAvailableRecordings_deleteClicked_triggersDeletion() {
+        val recording =   PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR)
+        val mockSensor = mock<IHeartRateSensor> {
+            on { recordings } doReturn MutableStateFlow(listOf(recording))
+        }
+
+        composeTestRule.setContent {
+            RecordingsScreen(
+                sensor = mockSensor
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTag("test-recording-item-0-delete-btn")
+            .performClick()
+
+        verify(mockSensor).deleteRecording(recording)
+    }
 
 }
