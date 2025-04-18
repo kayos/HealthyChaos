@@ -57,6 +57,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.8")
+    androidTestImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+    androidTestImplementation("org.mockito:mockito-core:5.17.0")
+    androidTestImplementation("org.mockito:mockito-android:5.17.0")
     debugImplementation("androidx.compose.ui:ui-tooling:1.7.8")
 
     // COMPOSE ----------------------------------

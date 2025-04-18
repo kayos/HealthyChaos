@@ -1,4 +1,6 @@
 package com.kayos.healthykayos
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -7,12 +9,16 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.kayos.healthykayos.doubles.SensorStub
+import com.kayos.healthykayos.sensor.IHeartRateSensor
 import com.polar.sdk.api.PolarBleApi
+import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
+import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import java.util.Calendar
 import java.util.Date
 
@@ -97,27 +103,36 @@ class RecordingsScreenTest {
         }
 
         composeTestRule
-            .onNodeWithTag("test-reocringd-item-0")
+            .onNodeWithTag("test-recording-item-0")
             .isDisplayed()
 
         composeTestRule
-            .onNodeWithTag("test-reocringd-item-1")
+            .onNodeWithTag("test-recording-item-1")
             .isDisplayed()
     }
-//
-//    @Test
-//    fun recordingsScreen_onAvailableRecordings_downloadClicked_startsDownload() {
-//        composeTestRule.setContent {
-//            RecordingsScreen(
-//                sensor = SensorStub(
-//                    heartRate = MutableStateFlow(null),
-//                    recordings = MutableStateFlow(emptyList())
-//                )
-//            )
-//        }
-//
-//    }
-//
+
+    @Test
+    fun recordingsScreen_onAvailableRecordings_downloadClicked_startsDownload() {
+        val recording =   PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR)
+        val mockData = mock<PolarOfflineRecordingData>()
+        val mockSensor = mock<IHeartRateSensor> {
+            on { recordings } doReturn MutableStateFlow(listOf(recording))
+            on { downloadRecording(recording) } doReturn Single.just(mockData)
+        }
+
+        composeTestRule.setContent {
+            RecordingsScreen(
+                sensor = mockSensor
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTag("test-recording-item-0-download-btn")
+            .performClick()
+
+        verify(mockSensor).downloadRecording(recording)
+    }
+
 //    @Test
 //    fun recordingsScreen_onAvailableRecordings_deleteClicked_triggersDeletion() {
 //

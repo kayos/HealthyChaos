@@ -226,13 +226,13 @@ fun RecordingsScreen(sensor: IHeartRateSensor) {
             itemsIndexed(recordings){ index, recording ->
                 RecordingItem(
                     recording,
+                    index,
                     onDownloadClick = {
                         download(recording)
                     },
                     onDeleteClick = {
                         sensor.deleteRecording(recording)
-                    },
-                    itemModifier = Modifier.testTag("test-reocringd-item-${index}")
+                    }
                 )
             }
         }
@@ -242,9 +242,9 @@ fun RecordingsScreen(sensor: IHeartRateSensor) {
 @Composable
 fun RecordingItem(
     recording: PolarOfflineRecordingEntry,
+    index: Int,
     onDownloadClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    itemModifier: Modifier,) {
+    onDeleteClick: () -> Unit) {
 
     Box(
         modifier = Modifier
@@ -258,7 +258,7 @@ fun RecordingItem(
                 .padding(16.dp)
         ) {
             ListItem(
-                modifier = itemModifier.padding(4.dp),
+                modifier = Modifier.padding(4.dp).testTag("test-recording-item-${index}"),
                 headlineContent = {
                     Text(
                         text = recording.date.toString(),
@@ -273,7 +273,7 @@ fun RecordingItem(
                 },
                 trailingContent = {
                     Row{
-                    IconButton(onClick = onDownloadClick) {
+                    IconButton(onClick = onDownloadClick, modifier = Modifier.testTag("test-recording-item-${index}-download-btn")) {
                         Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Download")
                     }
                     IconButton(
