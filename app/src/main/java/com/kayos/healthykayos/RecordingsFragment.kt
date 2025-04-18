@@ -3,7 +3,6 @@ package com.kayos.healthykayos
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -38,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.IHeartRateSensor
@@ -223,7 +223,7 @@ fun RecordingsScreen(sensor: IHeartRateSensor) {
             Text("Refresh")
         }
         LazyColumn {
-            items(recordings){ recording ->
+            itemsIndexed(recordings){ index, recording ->
                 RecordingItem(
                     recording,
                     onDownloadClick = {
@@ -232,7 +232,7 @@ fun RecordingsScreen(sensor: IHeartRateSensor) {
                     onDeleteClick = {
                         sensor.deleteRecording(recording)
                     },
-                    itemModifier = Modifier.testTag("test-reocringd-item-${recording.date.toString()}")
+                    itemModifier = Modifier.testTag("test-reocringd-item-${index}")
                 )
             }
         }
