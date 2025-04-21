@@ -6,7 +6,6 @@ import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.flow.StateFlow
 
 // TODO: remove any reference to Polar stuff to make this a more generic interface
@@ -24,7 +23,7 @@ interface IHeartRateSensor {
     fun startRecording(): Completable
     fun stopRecording(): Completable
     fun deleteRecording(entry: PolarOfflineRecordingEntry)
-    fun downloadRecording(recording: PolarOfflineRecordingEntry): Single<PolarOfflineRecordingData>
+    suspend fun downloadRecording(recording: PolarOfflineRecordingEntry): PolarOfflineRecordingData
     suspend fun isRecording(): Boolean
     fun startHeartRateStream()
     fun stopHeartRateStream()

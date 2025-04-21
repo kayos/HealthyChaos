@@ -180,8 +180,8 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
             )
     }
 
-    override fun downloadRecording(recording: PolarOfflineRecordingEntry): Single<PolarOfflineRecordingData> {
-        return api.getOfflineRecord(selectedDeviceId!!, recording)
+    override suspend fun downloadRecording(recording: PolarOfflineRecordingEntry): PolarOfflineRecordingData {
+        return api.getOfflineRecord(selectedDeviceId!!, recording).await()
     }
 
     override suspend fun isRecording(): Boolean {

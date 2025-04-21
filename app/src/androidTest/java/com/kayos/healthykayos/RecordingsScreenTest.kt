@@ -9,9 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.kayos.healthykayos.doubles.SensorStub
 import com.kayos.healthykayos.sensor.IHeartRateSensor
 import com.polar.sdk.api.PolarBleApi
-import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
-import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -21,6 +19,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import java.io.Writer
 import java.util.Calendar
 import java.util.Date
 
@@ -40,7 +39,8 @@ class RecordingsScreenTest {
                 ),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},
-                onStopRecordingClick = {}
+                onStopRecordingClick = {},
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
             )
         }
 
@@ -64,7 +64,8 @@ class RecordingsScreenTest {
                 ),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = { recording = true },
-                onStopRecordingClick = { recording = false }
+                onStopRecordingClick = { recording = false },
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
             )
         }
 
@@ -85,7 +86,8 @@ class RecordingsScreenTest {
                 ),
                 isRecording = RecordingState.Recording(),
                 onStartRecordingClick = {},
-                onStopRecordingClick = {}
+                onStopRecordingClick = {},
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
             )
         }
 
@@ -109,7 +111,8 @@ class RecordingsScreenTest {
                 ),
                 isRecording = RecordingState.Recording(),
                 onStartRecordingClick = { recording = true },
-                onStopRecordingClick = { recording = false }
+                onStopRecordingClick = { recording = false },
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
             )
         }
 
@@ -136,7 +139,8 @@ class RecordingsScreenTest {
                 ),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},
-                onStopRecordingClick = {}
+                onStopRecordingClick = {},
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
             )
         }
 
@@ -151,19 +155,20 @@ class RecordingsScreenTest {
 
     @Test
     fun recordingsScreen_onAvailableRecordings_downloadClicked_startsDownload() {
-        val recording =   PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR)
-        val mockData = mock<PolarOfflineRecordingData>()
-        val mockSensor = mock<IHeartRateSensor> {
-            on { recordings } doReturn MutableStateFlow(listOf(recording))
-            on { downloadRecording(recording) } doReturn Single.just(mockData)
-        }
-
+        var downloading = false
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor = mockSensor,
+                sensor = SensorStub(
+                    heartRate = MutableStateFlow(null),
+                    recordings = MutableStateFlow(listOf(
+                        PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR)
+                    ))
+                ),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},
-                onStopRecordingClick = {}
+                onStopRecordingClick = {},
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->
+                    downloading = true}
             )
         }
 
@@ -171,7 +176,7 @@ class RecordingsScreenTest {
             .onNodeWithTag("test-recording-item-0-download-btn")
             .performClick()
 
-        verify(mockSensor).downloadRecording(recording)
+        assertTrue(downloading)
     }
 
     @Test
@@ -186,7 +191,8 @@ class RecordingsScreenTest {
                 sensor = mockSensor,
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},
-                onStopRecordingClick = {}
+                onStopRecordingClick = {},
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
             )
         }
 

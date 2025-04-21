@@ -2,7 +2,6 @@ package com.kayos.healthykayos
 
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,15 +42,11 @@ import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.IHeartRateSensor
 import com.kayos.healthykayos.sensor.PolarHeartRateSensor
-import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
-import java.io.IOException
-import java.util.Calendar
+import java.io.Writer
 
 class RecordingsFragment : Fragment() {
 
@@ -102,7 +97,11 @@ private fun RecordingsScreen(
         sensor,
         isRecording,
         onStartRecordingClick = { viewModel.startRecording() },
-        onStopRecordingClick = { viewModel.stopRecording() })
+        onStopRecordingClick = { viewModel.stopRecording() },
+        onDownloadClick = { recording: PolarOfflineRecordingEntry, writer: Writer ->
+            viewModel.download(recording, writer)
+        }
+    )
 }
 
 @Composable
@@ -110,60 +109,13 @@ fun RecordingsScreen(
     sensor: IHeartRateSensor,
     isRecording: RecordingState,
     onStartRecordingClick: () -> Unit,
-    onStopRecordingClick: () -> Unit)
+    onStopRecordingClick: () -> Unit,
+    onDownloadClick: (PolarOfflineRecordingEntry,Writer) -> Unit
+)
 {
     val recordings = sensor.recordings.collectAsState().value.sortedBy { entry -> entry.date }
 
     val context = LocalContext.current
-
-    fun saveDataToCSV(data : PolarOfflineRecordingData.HrOfflineRecording) {
-        if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-            val filePath = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "polar-${data.startTime.time}.csv")
-            val fileWriter: FileWriter
-            val bufferedWriter: BufferedWriter
-            try {
-                fileWriter = FileWriter(filePath)
-                bufferedWriter = BufferedWriter(fileWriter)
-
-                bufferedWriter.write("time,hr,correctedHr")
-                bufferedWriter.newLine()
-
-                var timestamp = data.startTime
-                for (sample in data.data.samples) {
-                    timestamp.add(Calendar.SECOND, 1)
-                    bufferedWriter.write("${timestamp.time},${sample.hr},${sample.correctedHr}")
-                    bufferedWriter.newLine()
-                }
-                bufferedWriter.flush()
-                bufferedWriter.close()
-                Log.d("RecordingsFragment", "Done saving to file: $filePath")
-            } catch (e: IOException) {
-                Log.e("RecordingsFragment", "Error saving. ${e.message}")
-            }
-        } else {
-            Log.e("RecordingsFragment", "External storage is not available")
-        }
-    }
-
-    fun download(recording: PolarOfflineRecordingEntry) {
-         sensor.downloadRecording(recording)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { data: PolarOfflineRecordingData ->
-                    when (data) {
-                        is PolarOfflineRecordingData.HrOfflineRecording -> {
-                            saveDataToCSV(data)
-                        }
-                        else -> {
-                            Log.d("RecordingsFragment", "Recording type is not yet implemented")
-                        }
-                    }
-                },
-                { throwable ->
-                    throwable.printStackTrace()
-                })
-    }
 
     Column {
         if (isRecording is RecordingState.Recording)
@@ -203,8 +155,12 @@ fun RecordingsScreen(
                     recording,
                     index,
                     onDownloadClick = {
-                        download(recording)
-                    },
+                        if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
+                            val filePath = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "polar-${recording.date.time}.csv")
+                            val fileWriter = FileWriter(filePath)
+                            val bufferedWriter = BufferedWriter(fileWriter)
+                            onDownloadClick(recording, bufferedWriter)
+                        }},
                     onDeleteClick = {
                         sensor.deleteRecording(recording)
                     }

@@ -8,11 +8,16 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.IHeartRateSensor
+import com.polar.sdk.api.model.PolarOfflineRecordingData
+import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.await
+import java.io.IOException
+import java.io.Writer
+import java.util.Calendar
 
 class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
     val _recordingState : MutableStateFlow<RecordingState> = MutableStateFlow(RecordingState.NotRecording())
@@ -51,6 +56,41 @@ class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
                 _recordingState.value = RecordingState.Recording()
                 Log.e(TAG, "Problem stopping recording ${e.message}")
             }
+        }
+    }
+
+
+    fun download(recording: PolarOfflineRecordingEntry, writer: Writer) {
+        viewModelScope.launch(Dispatchers.Main) {
+            val data = sensor.downloadRecording(recording)
+            when (data) {
+                is PolarOfflineRecordingData.HrOfflineRecording -> {
+                    saveDataToCSV(data, writer)
+                }
+                else -> {
+                    Log.d("RecordingsFragment", "Recording type is not yet implemented")
+                }
+            }
+        }
+    }
+
+
+    fun saveDataToCSV(data : PolarOfflineRecordingData.HrOfflineRecording, writer: Writer) {
+        try {
+            writer.write("time,hr,correctedHr")
+            writer.write("\n")
+
+            var timestamp = data.startTime
+            for (sample in data.data.samples) {
+                timestamp.add(Calendar.SECOND, 1)
+                writer.write("${timestamp.time},${sample.hr},${sample.correctedHr}")
+                writer.write("\n")
+            }
+            writer.flush()
+            writer.close()
+            Log.d(TAG, "Done saving to file")
+        } catch (e: IOException) {
+            Log.e(TAG, "Error saving. ${e.message}")
         }
     }
 

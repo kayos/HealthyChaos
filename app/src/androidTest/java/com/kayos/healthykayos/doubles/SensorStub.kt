@@ -46,14 +46,13 @@ class SensorStub(override val heartRate: StateFlow<HeartRate?>,
         TODO("Not yet implemented")
     }
 
-    override fun downloadRecording(recording: PolarOfflineRecordingEntry): Single<PolarOfflineRecordingData> {
+    override suspend fun downloadRecording(recording: PolarOfflineRecordingEntry): PolarOfflineRecordingData {
         TODO("Not yet implemented")
     }
 
     override suspend fun isRecording(): Boolean {
         TODO("Not yet implemented")
     }
-
 
     override fun startHeartRateStream() {
         TODO("Not yet implemented")
