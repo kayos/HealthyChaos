@@ -52,9 +52,6 @@ import java.io.FileWriter
 import java.io.IOException
 import java.util.Calendar
 
-/**
- * A simple [Fragment] subclass as the second destination in the navigation.
- */
 class RecordingsFragment : Fragment() {
 
     private val sensor: PolarHeartRateSensor by lazy {
