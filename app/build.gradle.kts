@@ -51,6 +51,8 @@ dependencies {
     implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
     implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.7.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation (libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)

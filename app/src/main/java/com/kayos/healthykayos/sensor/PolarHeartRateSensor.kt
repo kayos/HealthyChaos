@@ -20,6 +20,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.rx3.await
 import java.time.Instant
 import java.util.UUID
 
@@ -181,6 +182,12 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
 
     override fun downloadRecording(recording: PolarOfflineRecordingEntry): Single<PolarOfflineRecordingData> {
         return api.getOfflineRecord(selectedDeviceId!!, recording)
+    }
+
+    override suspend fun isRecording(): Boolean {
+        return api.getOfflineRecordingStatus(selectedDeviceId!!).map {
+            runningRecordings -> runningRecordings.contains(PolarBleApi.PolarDeviceDataType.HR)
+        }.await()
     }
 
     override fun startHeartRateStream() {

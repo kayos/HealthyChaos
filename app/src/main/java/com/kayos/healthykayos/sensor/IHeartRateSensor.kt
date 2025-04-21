@@ -25,7 +25,7 @@ interface IHeartRateSensor {
     fun stopRecording(): Completable
     fun deleteRecording(entry: PolarOfflineRecordingEntry)
     fun downloadRecording(recording: PolarOfflineRecordingEntry): Single<PolarOfflineRecordingData>
+    suspend fun isRecording(): Boolean
     fun startHeartRateStream()
     fun stopHeartRateStream()
-
 }

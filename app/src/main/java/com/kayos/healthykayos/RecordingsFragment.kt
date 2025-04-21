@@ -28,8 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
@@ -38,6 +36,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
 import com.kayos.healthykayos.sensor.IHeartRateSensor
@@ -92,9 +91,12 @@ class RecordingsFragment : Fragment() {
 
 
 @Composable
-fun RecordingsScreen(sensor: IHeartRateSensor) {
+fun RecordingsScreen(
+    sensor: IHeartRateSensor,
+    viewModel: RecordingsViewModel = viewModel(factory = RecordingsViewModel.Factory))
+{
     val recordings = sensor.recordings.collectAsState().value.sortedBy { entry -> entry.date }
-    val isRecording = remember { mutableStateOf(false) }
+    val isRecording = viewModel.recordingState.collectAsState()
     val context = LocalContext.current
 
     fun saveDataToCSV(data : PolarOfflineRecordingData.HrOfflineRecording) {
@@ -132,17 +134,17 @@ fun RecordingsScreen(sensor: IHeartRateSensor) {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnComplete {
-                isRecording.value = true
+                viewModel.setRecording()
             }
             .doOnError {
-                isRecording.value = false
+                viewModel.setNotRecording()
             }
             .subscribe(
                 { },
                 {
                     throwable ->
                     //TODO fix logic around isRecording
-                    isRecording.value = true
+                    viewModel.setRecording()
                     throwable.printStackTrace()
             })
     }
@@ -152,16 +154,16 @@ fun RecordingsScreen(sensor: IHeartRateSensor) {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnComplete {
-                isRecording.value = false
+                viewModel.setNotRecording()
             }
             .doOnError {
-                isRecording.value = true
+                viewModel.setRecording()
             }
             .subscribe(
                 { },
                 { throwable ->
                     // Handle any error here explicitly
-                    isRecording.value = false
+                    viewModel.setRecording()
                     // Log or process the error as needed
                     throwable.printStackTrace() // Or use any other error logging mechanism
                 })
@@ -188,7 +190,7 @@ fun RecordingsScreen(sensor: IHeartRateSensor) {
     }
 
     Column {
-        if (isRecording.value)
+        if (isRecording.value is RecordingState.Recording)
         {
             Button(
                 onClick = {  stopRecording()  },
@@ -210,7 +212,7 @@ fun RecordingsScreen(sensor: IHeartRateSensor) {
         }
 
 
-        Text(text = if (isRecording.value) "Recording..." else "Not Recording")
+        Text(text = if (isRecording.value is RecordingState.Recording) "Recording..." else "Not Recording")
 
         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
         Button(modifier = Modifier.testTag("test-refresh-recordings-btn"),
