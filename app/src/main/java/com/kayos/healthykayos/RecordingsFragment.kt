@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
@@ -36,6 +37,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
@@ -89,14 +91,29 @@ class RecordingsFragment : Fragment() {
     }
 }
 
+@Composable
+private fun RecordingsScreen(
+    sensor: IHeartRateSensor,
+    viewModel: RecordingsViewModel = viewModel(factory = RecordingsViewModel.Factory))
+{
+    val isRecording by viewModel.recordingState.collectAsStateWithLifecycle()
+
+    RecordingsScreen(
+        sensor,
+        isRecording,
+        onStartRecordingClick = { viewModel.startRecording() },
+        onStopRecordingClick = { viewModel.stopRecording() })
+}
 
 @Composable
 fun RecordingsScreen(
     sensor: IHeartRateSensor,
-    viewModel: RecordingsViewModel = viewModel(factory = RecordingsViewModel.Factory))
+    isRecording: RecordingState,
+    onStartRecordingClick: () -> Unit,
+    onStopRecordingClick: () -> Unit)
 {
     val recordings = sensor.recordings.collectAsState().value.sortedBy { entry -> entry.date }
-    val isRecording = viewModel.recordingState.collectAsState()
+
     val context = LocalContext.current
 
     fun saveDataToCSV(data : PolarOfflineRecordingData.HrOfflineRecording) {
@@ -128,47 +145,6 @@ fun RecordingsScreen(
         }
     }
 
-    // TODO start stop is leaking subscriptions - FIX
-    fun startRecording() {
-        sensor.startRecording()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnComplete {
-                viewModel.setRecording()
-            }
-            .doOnError {
-                viewModel.setNotRecording()
-            }
-            .subscribe(
-                { },
-                {
-                    throwable ->
-                    //TODO fix logic around isRecording
-                    viewModel.setRecording()
-                    throwable.printStackTrace()
-            })
-    }
-
-    fun stopRecording() {
-        sensor.stopRecording()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnComplete {
-                viewModel.setNotRecording()
-            }
-            .doOnError {
-                viewModel.setRecording()
-            }
-            .subscribe(
-                { },
-                { throwable ->
-                    // Handle any error here explicitly
-                    viewModel.setRecording()
-                    // Log or process the error as needed
-                    throwable.printStackTrace() // Or use any other error logging mechanism
-                })
-    }
-
     fun download(recording: PolarOfflineRecordingEntry) {
          sensor.downloadRecording(recording)
             .subscribeOn(Schedulers.io())
@@ -190,10 +166,10 @@ fun RecordingsScreen(
     }
 
     Column {
-        if (isRecording.value is RecordingState.Recording)
+        if (isRecording is RecordingState.Recording)
         {
             Button(
-                onClick = {  stopRecording()  },
+                onClick = onStopRecordingClick,
                 modifier = Modifier
                     .padding(bottom = 8.dp)
                     .testTag("test-stop-record-btn")
@@ -202,7 +178,7 @@ fun RecordingsScreen(
             }
         } else {
             Button(
-                onClick = {  startRecording() },
+                onClick = onStartRecordingClick,
                 modifier = Modifier
                     .padding(bottom = 8.dp)
                     .testTag("test-start-record-btn")
@@ -212,7 +188,7 @@ fun RecordingsScreen(
         }
 
 
-        Text(text = if (isRecording.value is RecordingState.Recording) "Recording..." else "Not Recording")
+        Text(text = if (isRecording is RecordingState.Recording) "Recording..." else "Not Recording")
 
         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
         Button(modifier = Modifier.testTag("test-refresh-recordings-btn"),
@@ -257,7 +233,9 @@ fun RecordingItem(
                 .padding(16.dp)
         ) {
             ListItem(
-                modifier = Modifier.padding(4.dp).testTag("test-recording-item-${index}"),
+                modifier = Modifier
+                    .padding(4.dp)
+                    .testTag("test-recording-item-${index}"),
                 headlineContent = {
                     Text(
                         text = recording.date.toString(),
@@ -279,7 +257,8 @@ fun RecordingItem(
                     }
                     IconButton(
                         onClick = onDeleteClick,
-                        modifier = Modifier.padding(start = 8.dp)
+                        modifier = Modifier
+                            .padding(start = 8.dp)
                             .testTag("test-recording-item-${index}-delete-btn")
                     ) {
                         Icon(Icons.Default.Delete, contentDescription = "Delete")

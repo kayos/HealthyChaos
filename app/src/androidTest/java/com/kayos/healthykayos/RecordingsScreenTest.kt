@@ -1,6 +1,4 @@
 package com.kayos.healthykayos
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -13,13 +11,16 @@ import com.kayos.healthykayos.sensor.IHeartRateSensor
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import java.util.Calendar
 import java.util.Date
 
@@ -36,7 +37,10 @@ class RecordingsScreenTest {
                 sensor = SensorStub(
                     heartRate = MutableStateFlow(null),
                     recordings = MutableStateFlow(emptyList())
-                )
+                ),
+                isRecording = RecordingState.NotRecording(),
+                onStartRecordingClick = {},
+                onStopRecordingClick = {}
             )
         }
 
@@ -51,14 +55,16 @@ class RecordingsScreenTest {
 
     @Test
     fun recordingsScreen_whenStartClicked_StartsRecording() {
-        val mockSensor = mock<IHeartRateSensor>{
-            on { recordings } doReturn MutableStateFlow(emptyList())
-            on { startRecording() } doReturn Completable.complete()
-        }
-
+       var recording = false
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor = mockSensor
+                sensor =  SensorStub(
+                    heartRate = MutableStateFlow(null),
+                    recordings = MutableStateFlow(emptyList())
+                ),
+                isRecording = RecordingState.NotRecording(),
+                onStartRecordingClick = { recording = true },
+                onStopRecordingClick = { recording = false }
             )
         }
 
@@ -66,23 +72,22 @@ class RecordingsScreenTest {
             .onNodeWithTag("test-start-record-btn")
             .performClick()
 
-        verify(mockSensor).startRecording()
+        assertTrue(recording)
     }
 
     @Test
     fun recordingsScreen_whenRecording_onlyStopRecordingAvailable() {
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor = SensorStub(
+                sensor =  SensorStub(
                     heartRate = MutableStateFlow(null),
                     recordings = MutableStateFlow(emptyList())
-                )
+                ),
+                isRecording = RecordingState.Recording(),
+                onStartRecordingClick = {},
+                onStopRecordingClick = {}
             )
         }
-
-        composeTestRule
-            .onNodeWithTag("test-start-record-btn")
-            .performClick()
 
         composeTestRule
             .onNodeWithTag("test-stop-record-btn")
@@ -91,6 +96,28 @@ class RecordingsScreenTest {
         composeTestRule
             .onNodeWithTag("test-start-record-btn")
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun recordingsScreen_whenStopClicked_StopsRecording() {
+        var recording = true
+        composeTestRule.setContent {
+            RecordingsScreen(
+                sensor =  SensorStub(
+                    heartRate = MutableStateFlow(null),
+                    recordings = MutableStateFlow(emptyList())
+                ),
+                isRecording = RecordingState.Recording(),
+                onStartRecordingClick = { recording = true },
+                onStopRecordingClick = { recording = false }
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTag("test-stop-record-btn")
+            .performClick()
+
+        assertFalse(recording)
     }
 
     @Test
@@ -106,7 +133,10 @@ class RecordingsScreenTest {
                         PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR),
                         PolarOfflineRecordingEntry("2", 456, Date(), PolarBleApi.PolarDeviceDataType.PRESSURE)
                     ))
-                )
+                ),
+                isRecording = RecordingState.NotRecording(),
+                onStartRecordingClick = {},
+                onStopRecordingClick = {}
             )
         }
 
@@ -130,7 +160,10 @@ class RecordingsScreenTest {
 
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor = mockSensor
+                sensor = mockSensor,
+                isRecording = RecordingState.NotRecording(),
+                onStartRecordingClick = {},
+                onStopRecordingClick = {}
             )
         }
 
@@ -150,7 +183,10 @@ class RecordingsScreenTest {
 
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor = mockSensor
+                sensor = mockSensor,
+                isRecording = RecordingState.NotRecording(),
+                onStartRecordingClick = {},
+                onStopRecordingClick = {}
             )
         }
 
