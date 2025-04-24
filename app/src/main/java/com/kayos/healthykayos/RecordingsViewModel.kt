@@ -74,7 +74,7 @@ class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
         }
     }
 
-
+    // TODO refactor into separate Export class
     fun saveDataToCSV(data : PolarOfflineRecordingData.HrOfflineRecording, writer: Writer) {
         try {
             writer.write("time,hr,correctedHr")
