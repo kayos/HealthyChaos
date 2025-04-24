@@ -8,11 +8,11 @@ import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class SensorStub(override val heartRate: StateFlow<HeartRate?>,
-                 override val recordings: StateFlow<List<PolarOfflineRecordingEntry>>
+                 override val recordings: StateFlow<List<PolarOfflineRecordingEntry>> = MutableStateFlow(emptyList())
 ) : IHeartRateSensor {
     override fun search() {
         TODO("Not yet implemented")

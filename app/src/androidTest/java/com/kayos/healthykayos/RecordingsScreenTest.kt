@@ -32,8 +32,8 @@ class RecordingsScreenTest {
             RecordingsScreen(
                 sensor = SensorStub(
                     heartRate = MutableStateFlow(null),
-                    recordings = MutableStateFlow(emptyList())
                 ),
+                recordings = emptyList(),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},
                 onStopRecordingClick = {},
@@ -58,8 +58,8 @@ class RecordingsScreenTest {
             RecordingsScreen(
                 sensor =  SensorStub(
                     heartRate = MutableStateFlow(null),
-                    recordings = MutableStateFlow(emptyList())
                 ),
+                recordings = emptyList(),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = { recording = true },
                 onStopRecordingClick = { recording = false },
@@ -81,8 +81,8 @@ class RecordingsScreenTest {
             RecordingsScreen(
                 sensor =  SensorStub(
                     heartRate = MutableStateFlow(null),
-                    recordings = MutableStateFlow(emptyList())
                 ),
+                recordings = emptyList(),
                 isRecording = RecordingState.Recording(),
                 onStartRecordingClick = {},
                 onStopRecordingClick = {},
@@ -107,8 +107,8 @@ class RecordingsScreenTest {
             RecordingsScreen(
                 sensor =  SensorStub(
                     heartRate = MutableStateFlow(null),
-                    recordings = MutableStateFlow(emptyList())
                 ),
+                recordings = emptyList(),
                 isRecording = RecordingState.Recording(),
                 onStartRecordingClick = { recording = true },
                 onStopRecordingClick = { recording = false },
@@ -133,10 +133,10 @@ class RecordingsScreenTest {
             RecordingsScreen(
                 sensor = SensorStub(
                     heartRate = MutableStateFlow(null),
-                    recordings = MutableStateFlow(listOf(
-                        PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR),
-                        PolarOfflineRecordingEntry("2", 456, Date(), PolarBleApi.PolarDeviceDataType.PRESSURE),
-                    ))
+                ),
+                recordings = listOf(
+                    PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR),
+                    PolarOfflineRecordingEntry("2", 456, Date(), PolarBleApi.PolarDeviceDataType.PRESSURE),
                 ),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},
@@ -161,10 +161,10 @@ class RecordingsScreenTest {
         composeTestRule.setContent {
             RecordingsScreen(
                 sensor = SensorStub(
-                    heartRate = MutableStateFlow(null),
-                    recordings = MutableStateFlow(listOf(
-                        PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR)
-                    ))
+                    heartRate = MutableStateFlow(null)
+                ),
+                recordings = listOf(
+                    PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR)
                 ),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},
@@ -184,17 +184,16 @@ class RecordingsScreenTest {
 
     @Test
     fun recordingsScreen_onAvailableRecordings_deleteClicked_triggersDeletion() {
-        val now = Date() // same date for all entries avoids sort, meh
-        val expected = PolarOfflineRecordingEntry("2", 345, now, PolarBleApi.PolarDeviceDataType.PRESSURE)
+        val expected = PolarOfflineRecordingEntry("2", 345, Date(), PolarBleApi.PolarDeviceDataType.PRESSURE)
         var actualDeleted : PolarOfflineRecordingEntry? = null
         composeTestRule.setContent {
             RecordingsScreen(
                 sensor = SensorStub(
                     heartRate = MutableStateFlow(null),
-                    recordings = MutableStateFlow(listOf(
-                        PolarOfflineRecordingEntry("1", 123, now, PolarBleApi.PolarDeviceDataType.HR),
-                        expected
-                    ))
+                ),
+                recordings = listOf(
+                    PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR),
+                    expected
                 ),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},

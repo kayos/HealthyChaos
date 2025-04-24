@@ -13,6 +13,7 @@ import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.await
 import java.io.IOException
@@ -22,6 +23,8 @@ import java.util.Calendar
 class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
     val _recordingState : MutableStateFlow<RecordingState> = MutableStateFlow(RecordingState.NotRecording())
     val recordingState: StateFlow<RecordingState> get() = _recordingState
+
+    val recordings = sensor.recordings.map { recordings -> recordings.sortedBy { entry -> entry.date } }
 
     init {
         viewModelScope.launch {

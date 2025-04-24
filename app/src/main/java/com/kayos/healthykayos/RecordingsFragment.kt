@@ -26,7 +26,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -92,9 +91,11 @@ private fun RecordingsScreen(
     viewModel: RecordingsViewModel = viewModel(factory = RecordingsViewModel.Factory))
 {
     val isRecording by viewModel.recordingState.collectAsStateWithLifecycle()
+    val recordings by viewModel.recordings.collectAsStateWithLifecycle(initialValue = emptyList())
 
     RecordingsScreen(
         sensor,
+        recordings,
         isRecording,
         onStartRecordingClick = { viewModel.startRecording() },
         onStopRecordingClick = { viewModel.stopRecording() },
@@ -110,6 +111,7 @@ private fun RecordingsScreen(
 @Composable
 fun RecordingsScreen(
     sensor: IHeartRateSensor,
+    recordings: List<PolarOfflineRecordingEntry>,
     isRecording: RecordingState,
     onStartRecordingClick: () -> Unit,
     onStopRecordingClick: () -> Unit,
@@ -117,7 +119,6 @@ fun RecordingsScreen(
     onDeleteClick: (PolarOfflineRecordingEntry) -> Unit
 )
 {
-    val recordings = sensor.recordings.collectAsState().value.sortedBy { entry -> entry.date }
 
     val context = LocalContext.current
 
