@@ -164,20 +164,9 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
         return api.stopOfflineRecording(selectedDeviceId!!, PolarBleApi.PolarDeviceDataType.HR)
     }
 
-    override fun deleteRecording(entry: PolarOfflineRecordingEntry) {
-        deleteDisposable?.dispose()
-        deleteDisposable = api.removeOfflineRecord(selectedDeviceId!!, entry)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error: Throwable ->
-                    Log.e(TAG, "Failed to delete recording: $error")
-                },
-                onComplete = {
-                    _recordings.value = _recordings.value - entry
-                    deleteDisposable?.dispose()
-                    Log.d(TAG, "Done deleting recording")
-                }
-            )
+    override suspend fun deleteRecording(entry: PolarOfflineRecordingEntry) {
+        api.removeOfflineRecord(selectedDeviceId!!, entry).await()
+        listRecordings()
     }
 
     override suspend fun downloadRecording(recording: PolarOfflineRecordingEntry): PolarOfflineRecordingData {

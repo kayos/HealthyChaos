@@ -42,7 +42,7 @@ class SensorStub(override val heartRate: StateFlow<HeartRate?>,
         TODO("Not yet implemented")
     }
 
-    override fun deleteRecording(entry: PolarOfflineRecordingEntry) {
+    override suspend fun deleteRecording(entry: PolarOfflineRecordingEntry) {
         TODO("Not yet implemented")
     }
 

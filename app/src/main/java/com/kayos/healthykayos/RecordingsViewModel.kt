@@ -94,6 +94,12 @@ class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
         }
     }
 
+    fun deleteRecording(recording: PolarOfflineRecordingEntry) {
+        viewModelScope.launch(Dispatchers.Main) {
+            sensor.deleteRecording(recording)
+        }
+    }
+
     companion object {
         private const val TAG = "RecordingsViewModel"
         val Factory: ViewModelProvider.Factory = viewModelFactory {

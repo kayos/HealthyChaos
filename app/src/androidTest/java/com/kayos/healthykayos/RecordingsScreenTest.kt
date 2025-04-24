@@ -7,18 +7,15 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.kayos.healthykayos.doubles.SensorStub
-import com.kayos.healthykayos.sensor.IHeartRateSensor
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import java.io.Writer
 import java.util.Calendar
 import java.util.Date
@@ -40,7 +37,8 @@ class RecordingsScreenTest {
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},
                 onStopRecordingClick = {},
-                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
+                onDeleteClick = {}
             )
         }
 
@@ -65,7 +63,8 @@ class RecordingsScreenTest {
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = { recording = true },
                 onStopRecordingClick = { recording = false },
-                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
+                onDeleteClick = {}
             )
         }
 
@@ -87,7 +86,8 @@ class RecordingsScreenTest {
                 isRecording = RecordingState.Recording(),
                 onStartRecordingClick = {},
                 onStopRecordingClick = {},
-                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
+                onDeleteClick = {}
             )
         }
 
@@ -112,7 +112,8 @@ class RecordingsScreenTest {
                 isRecording = RecordingState.Recording(),
                 onStartRecordingClick = { recording = true },
                 onStopRecordingClick = { recording = false },
-                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
+                onDeleteClick = {}
             )
         }
 
@@ -134,13 +135,14 @@ class RecordingsScreenTest {
                     heartRate = MutableStateFlow(null),
                     recordings = MutableStateFlow(listOf(
                         PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR),
-                        PolarOfflineRecordingEntry("2", 456, Date(), PolarBleApi.PolarDeviceDataType.PRESSURE)
+                        PolarOfflineRecordingEntry("2", 456, Date(), PolarBleApi.PolarDeviceDataType.PRESSURE),
                     ))
                 ),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},
                 onStopRecordingClick = {},
-                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
+                onDeleteClick = {}
             )
         }
 
@@ -168,7 +170,8 @@ class RecordingsScreenTest {
                 onStartRecordingClick = {},
                 onStopRecordingClick = {},
                 onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->
-                    downloading = true}
+                    downloading = true},
+                onDeleteClick = {}
             )
         }
 
@@ -181,26 +184,31 @@ class RecordingsScreenTest {
 
     @Test
     fun recordingsScreen_onAvailableRecordings_deleteClicked_triggersDeletion() {
-        val recording =   PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR)
-        val mockSensor = mock<IHeartRateSensor> {
-            on { recordings } doReturn MutableStateFlow(listOf(recording))
-        }
-
+        val now = Date() // same date for all entries avoids sort, meh
+        val expected = PolarOfflineRecordingEntry("2", 345, now, PolarBleApi.PolarDeviceDataType.PRESSURE)
+        var actualDeleted : PolarOfflineRecordingEntry? = null
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor = mockSensor,
+                sensor = SensorStub(
+                    heartRate = MutableStateFlow(null),
+                    recordings = MutableStateFlow(listOf(
+                        PolarOfflineRecordingEntry("1", 123, now, PolarBleApi.PolarDeviceDataType.HR),
+                        expected
+                    ))
+                ),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},
                 onStopRecordingClick = {},
-                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->}
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
+                onDeleteClick = { recording -> actualDeleted = recording}
             )
         }
 
         composeTestRule
-            .onNodeWithTag("test-recording-item-0-delete-btn")
+            .onNodeWithTag("test-recording-item-1-delete-btn")
             .performClick()
 
-        verify(mockSensor).deleteRecording(recording)
+        assertEquals(expected, actualDeleted)
     }
 
 }

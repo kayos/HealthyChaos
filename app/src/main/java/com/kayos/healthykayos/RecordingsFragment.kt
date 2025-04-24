@@ -100,6 +100,9 @@ private fun RecordingsScreen(
         onStopRecordingClick = { viewModel.stopRecording() },
         onDownloadClick = { recording: PolarOfflineRecordingEntry, writer: Writer ->
             viewModel.download(recording, writer)
+        },
+        onDeleteClick = { recording: PolarOfflineRecordingEntry ->
+            viewModel.deleteRecording(recording)
         }
     )
 }
@@ -110,7 +113,8 @@ fun RecordingsScreen(
     isRecording: RecordingState,
     onStartRecordingClick: () -> Unit,
     onStopRecordingClick: () -> Unit,
-    onDownloadClick: (PolarOfflineRecordingEntry,Writer) -> Unit
+    onDownloadClick: (PolarOfflineRecordingEntry,Writer) -> Unit,
+    onDeleteClick: (PolarOfflineRecordingEntry) -> Unit
 )
 {
     val recordings = sensor.recordings.collectAsState().value.sortedBy { entry -> entry.date }
@@ -161,9 +165,7 @@ fun RecordingsScreen(
                             val bufferedWriter = BufferedWriter(fileWriter)
                             onDownloadClick(recording, bufferedWriter)
                         }},
-                    onDeleteClick = {
-                        sensor.deleteRecording(recording)
-                    }
+                    onDeleteClick = { onDeleteClick(recording) }
                 )
             }
         }
