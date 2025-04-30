@@ -6,10 +6,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.kayos.healthykayos.doubles.SensorStub
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
@@ -30,9 +28,6 @@ class RecordingsScreenTest {
     fun recordingsScreen_whenNotRecording_onlyStartRecordingAvailable() {
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor = SensorStub(
-                    heartRate = MutableStateFlow(null),
-                ),
                 recordings = emptyList(),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = {},
@@ -56,9 +51,6 @@ class RecordingsScreenTest {
        var recording = false
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor =  SensorStub(
-                    heartRate = MutableStateFlow(null),
-                ),
                 recordings = emptyList(),
                 isRecording = RecordingState.NotRecording(),
                 onStartRecordingClick = { recording = true },
@@ -79,9 +71,6 @@ class RecordingsScreenTest {
     fun recordingsScreen_whenRecording_onlyStopRecordingAvailable() {
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor =  SensorStub(
-                    heartRate = MutableStateFlow(null),
-                ),
                 recordings = emptyList(),
                 isRecording = RecordingState.Recording(),
                 onStartRecordingClick = {},
@@ -105,9 +94,6 @@ class RecordingsScreenTest {
         var recording = true
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor =  SensorStub(
-                    heartRate = MutableStateFlow(null),
-                ),
                 recordings = emptyList(),
                 isRecording = RecordingState.Recording(),
                 onStartRecordingClick = { recording = true },
@@ -131,9 +117,6 @@ class RecordingsScreenTest {
 
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor = SensorStub(
-                    heartRate = MutableStateFlow(null),
-                ),
                 recordings = listOf(
                     PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR),
                     PolarOfflineRecordingEntry("2", 456, Date(), PolarBleApi.PolarDeviceDataType.PRESSURE),
@@ -160,9 +143,6 @@ class RecordingsScreenTest {
         var downloading = false
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor = SensorStub(
-                    heartRate = MutableStateFlow(null)
-                ),
                 recordings = listOf(
                     PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR)
                 ),
@@ -188,9 +168,6 @@ class RecordingsScreenTest {
         var actualDeleted : PolarOfflineRecordingEntry? = null
         composeTestRule.setContent {
             RecordingsScreen(
-                sensor = SensorStub(
-                    heartRate = MutableStateFlow(null),
-                ),
                 recordings = listOf(
                     PolarOfflineRecordingEntry("1", 123, Date(), PolarBleApi.PolarDeviceDataType.HR),
                     expected

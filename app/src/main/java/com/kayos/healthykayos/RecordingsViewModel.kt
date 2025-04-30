@@ -11,9 +11,13 @@ import com.kayos.healthykayos.sensor.IHeartRateSensor
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.fold
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.await
 import java.io.IOException
@@ -24,7 +28,14 @@ class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
     val _recordingState : MutableStateFlow<RecordingState> = MutableStateFlow(RecordingState.NotRecording())
     val recordingState: StateFlow<RecordingState> get() = _recordingState
 
-    val recordings = sensor.recordings.map { recordings -> recordings.sortedBy { entry -> entry.date } }
+    // TODO: Refresh broken, get it working again and maybe a test
+    val recordings = sensor.listRecordings()
+        .map{ recordings -> recordings.sortedBy { entry -> entry.date } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList<PolarOfflineRecordingEntry>(),
+        )
 
     init {
         viewModelScope.launch {

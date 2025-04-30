@@ -8,6 +8,7 @@ import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -30,7 +31,7 @@ class SensorStub(override val heartRate: StateFlow<HeartRate?>,
         TODO("Not yet implemented")
     }
 
-    override fun listRecordings() {
+    override fun listRecordings(): Flow<List<PolarOfflineRecordingEntry>> {
         TODO("Not yet implemented")
     }
 

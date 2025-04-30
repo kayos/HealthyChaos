@@ -18,8 +18,10 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx3.await
 import java.time.Instant
 import java.util.UUID
@@ -202,24 +204,12 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
         _heartRate.value = null
     }
 
-    override fun listRecordings() {
-        recordingDisposable?.dispose()
-        _recordings.value = emptyList()
-        recordingDisposable = api.listOfflineRecordings(selectedDeviceId!!)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { recording: PolarOfflineRecordingEntry ->
-                    _recordings.value = _recordings.value + recording
-                    Log.d(TAG, "Found: ${recording.date}")
-                },
-                onError = { error: Throwable ->
-                    Log.e(TAG, "Failed to list recordings: $error")
-                },
-                onComplete = {
-                    recordingDisposable?.dispose()
-                    Log.d(TAG, "Done searching for recordings")
-                }
-            )
+    override fun listRecordings(): Flow<List<PolarOfflineRecordingEntry>> {
+        val recordings = mutableListOf<PolarOfflineRecordingEntry>()
+        return api.listOfflineRecordings(selectedDeviceId!!).map{
+            entry -> recordings.add(entry)
+            recordings.toList()
+        }.asFlow()
     }
 
 }

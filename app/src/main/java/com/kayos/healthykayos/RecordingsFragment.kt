@@ -38,9 +38,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
-import com.kayos.healthykayos.sensor.HeartRateProviderFactory
-import com.kayos.healthykayos.sensor.IHeartRateSensor
-import com.kayos.healthykayos.sensor.PolarHeartRateSensor
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import java.io.BufferedWriter
 import java.io.File
@@ -48,10 +45,6 @@ import java.io.FileWriter
 import java.io.Writer
 
 class RecordingsFragment : Fragment() {
-
-    private val sensor: PolarHeartRateSensor by lazy {
-        HeartRateProviderFactory.getPolarHeartRateSensor(requireActivity().applicationContext)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,7 +58,7 @@ class RecordingsFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
-                    RecordingsScreen(sensor)
+                    RecordingsScreen()
                 }
             }
         }
@@ -87,14 +80,12 @@ class RecordingsFragment : Fragment() {
 
 @Composable
 private fun RecordingsScreen(
-    sensor: IHeartRateSensor,
     viewModel: RecordingsViewModel = viewModel(factory = RecordingsViewModel.Factory))
 {
     val isRecording by viewModel.recordingState.collectAsStateWithLifecycle()
     val recordings by viewModel.recordings.collectAsStateWithLifecycle(initialValue = emptyList())
 
     RecordingsScreen(
-        sensor,
         recordings,
         isRecording,
         onStartRecordingClick = { viewModel.startRecording() },
@@ -110,7 +101,6 @@ private fun RecordingsScreen(
 
 @Composable
 fun RecordingsScreen(
-    sensor: IHeartRateSensor,
     recordings: List<PolarOfflineRecordingEntry>,
     isRecording: RecordingState,
     onStartRecordingClick: () -> Unit,
@@ -148,12 +138,12 @@ fun RecordingsScreen(
         Text(text = if (isRecording is RecordingState.Recording) "Recording..." else "Not Recording")
 
         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-        Button(modifier = Modifier.testTag("test-refresh-recordings-btn"),
-            onClick = {
-            sensor.listRecordings()
-        }) {
-            Text("Refresh")
-        }
+//        Button(modifier = Modifier.testTag("test-refresh-recordings-btn"),
+//            onClick = {
+//            sensor.listRecordings()
+//        }) {
+//            Text("Refresh")
+//        }
         LazyColumn {
             itemsIndexed(recordings){ index, recording ->
                 RecordingItem(
