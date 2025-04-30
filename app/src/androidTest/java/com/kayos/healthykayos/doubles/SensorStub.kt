@@ -12,9 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class SensorStub(override val heartRate: StateFlow<HeartRate?>,
-                 override val recordings: StateFlow<List<PolarOfflineRecordingEntry>> = MutableStateFlow(emptyList())
-) : IHeartRateSensor {
+class SensorStub(override val heartRate: StateFlow<HeartRate?>) : IHeartRateSensor {
     override fun search() {
         TODO("Not yet implemented")
     }

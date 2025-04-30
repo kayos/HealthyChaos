@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 // TODO: remove any reference to Polar stuff to make this a more generic interface
 interface IHeartRateSensor {
     val heartRate: StateFlow<HeartRate?>
-    val recordings: StateFlow<List<PolarOfflineRecordingEntry>>
 
     fun search()
     fun connect(device: PolarDeviceInfo): Unit

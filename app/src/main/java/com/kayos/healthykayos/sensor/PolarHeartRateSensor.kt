@@ -28,11 +28,6 @@ import java.util.UUID
 
 class PolarHeartRateSensor private constructor(context: Context): IHeartRateSensor {
 
-    private  var recordingDisposable : Disposable? = null
-    private  var deleteDisposable : Disposable? = null
-    private val _recordings = MutableStateFlow<List<PolarOfflineRecordingEntry>>(emptyList())
-    override val recordings: StateFlow<List<PolarOfflineRecordingEntry>> get() = _recordings
-
     private  var searchDisposable : Disposable? = null
     private val _availableDevices = MutableStateFlow<List<PolarDeviceInfo>>(emptyList())
     val availableDevices: StateFlow<List<PolarDeviceInfo>> get() = _availableDevices

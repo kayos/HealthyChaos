@@ -18,8 +18,7 @@ class RecordingsViewModelTest {
     @Test
     fun startRecording_setsRecordingState() {
         val viewModel = RecordingsViewModel(SensorStub(
-            heartRate = MutableStateFlow(null),
-            recordings = MutableStateFlow(emptyList())
+            heartRate = MutableStateFlow(null)
         ))
 
         viewModel.startRecording()
@@ -39,8 +38,7 @@ class RecordingsViewModelTest {
     @Test
     fun stopRecording_setsRecordingState() {
         val viewModel = RecordingsViewModel(SensorStub(
-            heartRate = MutableStateFlow(null),
-            recordings = MutableStateFlow(emptyList())
+            heartRate = MutableStateFlow(null)
         ))
         viewModel.startRecording()
 
