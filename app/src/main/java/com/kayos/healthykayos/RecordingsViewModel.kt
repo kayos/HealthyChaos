@@ -43,7 +43,6 @@ class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
                 true -> RecordingState.Recording()
                 false -> RecordingState.NotRecording()
             }
-
         }
     }
 
@@ -51,11 +50,11 @@ class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
         viewModelScope.launch(Dispatchers.Main) {
             try {
                 sensor.startRecording().await()
-                _recordingState.value = RecordingState.Recording()
             } catch (e: Exception) {
-                //TODO #13 reasses assumption about recording status
-                _recordingState.value = RecordingState.NotRecording()
                 Log.e(TAG, "Problem starting recording ${e.message}")
+            }
+            finally {
+                _recordingState.value = RecordingState.determineState(sensor.isRecording())
             }
         }
     }
@@ -64,15 +63,14 @@ class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
         viewModelScope.launch(Dispatchers.Main) {
             try {
                 sensor.stopRecording().await()
-                _recordingState.value = RecordingState.NotRecording()
             } catch (e: Exception) {
-                //TODO #13 reasses assumption about recording status
-                _recordingState.value = RecordingState.Recording()
                 Log.e(TAG, "Problem stopping recording ${e.message}")
+            }
+            finally {
+                _recordingState.value = RecordingState.determineState(sensor.isRecording())
             }
         }
     }
-
 
     fun download(recording: PolarOfflineRecordingEntry, writer: Writer) {
         viewModelScope.launch(Dispatchers.Main) {

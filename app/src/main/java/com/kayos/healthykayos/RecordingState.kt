@@ -12,4 +12,20 @@ sealed class RecordingState {
             return "NotRecording"
         }
     }
+
+    companion object {
+        fun determineState(isRecording: Boolean) : RecordingState{
+            return if (isRecording) Recording() else NotRecording()
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return this === other || (
+                this::class == other?.let { it::class }
+                )
+    }
+
+    override fun hashCode(): Int {
+        return this::class.hashCode()
+    }
 }
