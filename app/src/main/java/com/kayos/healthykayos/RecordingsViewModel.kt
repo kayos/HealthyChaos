@@ -11,13 +11,18 @@ import com.kayos.healthykayos.sensor.IHeartRateSensor
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.fold
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.switchMap
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.await
 import java.io.IOException
@@ -25,12 +30,16 @@ import java.io.Writer
 import java.util.Calendar
 
 class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
-    val _recordingState : MutableStateFlow<RecordingState> = MutableStateFlow(RecordingState.NotRecording())
+    private val _recordingState : MutableStateFlow<RecordingState> = MutableStateFlow(RecordingState.NotRecording())
     val recordingState: StateFlow<RecordingState> get() = _recordingState
 
-    // TODO: Refresh broken, get it working again and maybe a test
-    val recordings = sensor.listRecordings()
-        .map{ recordings -> recordings.sortedBy { entry -> entry.date } }
+    private val _refresh : MutableStateFlow<Int> = MutableStateFlow(0)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val recordings: Flow<List<PolarOfflineRecordingEntry>> = _refresh.flatMapLatest { _ ->
+            sensor.listRecordings()
+        }
+        .map { recordings -> recordings.sortedBy { entry -> entry.date } }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -110,6 +119,10 @@ class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
         viewModelScope.launch(Dispatchers.Main) {
             sensor.deleteRecording(recording)
         }
+    }
+
+    fun refresh() {
+        _refresh.tryEmit(_refresh.value+1)
     }
 
     companion object {

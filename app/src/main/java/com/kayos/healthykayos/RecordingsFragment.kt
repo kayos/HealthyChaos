@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -95,7 +96,8 @@ private fun RecordingsScreen(
         },
         onDeleteClick = { recording: PolarOfflineRecordingEntry ->
             viewModel.deleteRecording(recording)
-        }
+        },
+        onRefreshClick = { viewModel.refresh() }
     )
 }
 
@@ -105,8 +107,9 @@ fun RecordingsScreen(
     isRecording: RecordingState,
     onStartRecordingClick: () -> Unit,
     onStopRecordingClick: () -> Unit,
-    onDownloadClick: (PolarOfflineRecordingEntry,Writer) -> Unit,
-    onDeleteClick: (PolarOfflineRecordingEntry) -> Unit
+    onDownloadClick: (PolarOfflineRecordingEntry, Writer) -> Unit,
+    onDeleteClick: (PolarOfflineRecordingEntry) -> Unit,
+    onRefreshClick: () -> Unit,
 )
 {
 
@@ -138,12 +141,11 @@ fun RecordingsScreen(
         Text(text = if (isRecording is RecordingState.Recording) "Recording..." else "Not Recording")
 
         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-//        Button(modifier = Modifier.testTag("test-refresh-recordings-btn"),
-//            onClick = {
-//            sensor.listRecordings()
-//        }) {
-//            Text("Refresh")
-//        }
+        IconButton(
+            onClick = onRefreshClick,
+            modifier = Modifier.testTag("test-refresh-recordings-btn")) {
+            Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+        }
         LazyColumn {
             itemsIndexed(recordings){ index, recording ->
                 RecordingItem(

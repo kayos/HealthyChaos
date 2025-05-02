@@ -33,7 +33,8 @@ class RecordingsScreenTest {
                 onStartRecordingClick = {},
                 onStopRecordingClick = {},
                 onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onRefreshClick = {}
             )
         }
 
@@ -56,7 +57,8 @@ class RecordingsScreenTest {
                 onStartRecordingClick = { recording = true },
                 onStopRecordingClick = { recording = false },
                 onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onRefreshClick = {}
             )
         }
 
@@ -76,7 +78,8 @@ class RecordingsScreenTest {
                 onStartRecordingClick = {},
                 onStopRecordingClick = {},
                 onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onRefreshClick = {}
             )
         }
 
@@ -99,7 +102,8 @@ class RecordingsScreenTest {
                 onStartRecordingClick = { recording = true },
                 onStopRecordingClick = { recording = false },
                 onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onRefreshClick = {}
             )
         }
 
@@ -111,7 +115,7 @@ class RecordingsScreenTest {
     }
 
     @Test
-    fun recordingsScreen_refresh_listsAvailableRecordings() {
+    fun recordingsScreen_displaysAvailableRecordings() {
         val calendar = Calendar.getInstance()
         calendar.set(2025, Calendar.APRIL, 18)
 
@@ -125,7 +129,8 @@ class RecordingsScreenTest {
                 onStartRecordingClick = {},
                 onStopRecordingClick = {},
                 onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onRefreshClick = {}
             )
         }
 
@@ -136,6 +141,28 @@ class RecordingsScreenTest {
         composeTestRule
             .onNodeWithTag("test-recording-item-1")
             .isDisplayed()
+    }
+
+    @Test
+    fun recordingsScreen_whenRefreshClicked_refreshesRecordings() {
+        var refresh = false;
+        composeTestRule.setContent {
+            RecordingsScreen(
+                recordings = emptyList<PolarOfflineRecordingEntry>(),
+                isRecording = RecordingState.NotRecording(),
+                onStartRecordingClick = {},
+                onStopRecordingClick = {},
+                onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
+                onDeleteClick = {},
+                onRefreshClick = { refresh = true }
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTag("test-refresh-recordings-btn")
+            .performClick()
+
+        assertTrue(refresh)
     }
 
     @Test
@@ -151,7 +178,8 @@ class RecordingsScreenTest {
                 onStopRecordingClick = {},
                 onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->
                     downloading = true},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onRefreshClick = {}
             )
         }
 
@@ -176,7 +204,8 @@ class RecordingsScreenTest {
                 onStartRecordingClick = {},
                 onStopRecordingClick = {},
                 onDownloadClick = {recording: PolarOfflineRecordingEntry, writer: Writer ->},
-                onDeleteClick = { recording -> actualDeleted = recording}
+                onDeleteClick = { recording -> actualDeleted = recording},
+                onRefreshClick = {}
             )
         }
 
