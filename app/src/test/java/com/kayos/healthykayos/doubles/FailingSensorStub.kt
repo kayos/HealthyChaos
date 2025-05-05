@@ -11,7 +11,6 @@ import io.reactivex.rxjava3.core.Flowable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOf
 
 class FailingSensorStub() : IHeartRateSensor {
     override val heartRate: StateFlow<HeartRate?> = MutableStateFlow(null)

@@ -9,7 +9,6 @@ import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class SensorStub(override val heartRate: StateFlow<HeartRate?>) : IHeartRateSensor {
