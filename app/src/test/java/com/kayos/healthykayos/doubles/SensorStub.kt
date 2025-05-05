@@ -19,7 +19,7 @@ class SensorStub(override val heartRate: StateFlow<HeartRate?>) : IHeartRateSens
         TODO("Not yet implemented")
     }
 
-    override fun connect(device: PolarDeviceInfo) {
+    override fun connect(deviceId: String) {
         TODO("Not yet implemented")
     }
 

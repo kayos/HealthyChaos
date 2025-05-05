@@ -22,7 +22,7 @@ class FailingSensorStub() : IHeartRateSensor {
         TODO("Not yet implemented")
     }
 
-    override fun connect(device: PolarDeviceInfo) {
+    override fun connect(deviceId: String) {
         TODO("Not yet implemented")
     }
 

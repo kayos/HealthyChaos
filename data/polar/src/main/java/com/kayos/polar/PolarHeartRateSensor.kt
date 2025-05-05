@@ -143,8 +143,8 @@ class PolarHeartRateSensor private constructor(context: Context) : IHeartRateSen
             )
     }
 
-    override fun connect(device: PolarDeviceInfo) {
-        api.connectToDevice(device.deviceId)
+    override fun connect(deviceId: String) {
+        api.connectToDevice(deviceId)
     }
 
     override fun disconnect(id: String) {

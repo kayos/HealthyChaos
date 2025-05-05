@@ -84,7 +84,7 @@ fun Connections(
         }
         Column {
             availableDevices.forEach { device ->
-                DeviceItem(device, onClick = { sensor.connect(device) })
+                DeviceItem(device, onClick = { sensor.connect(device.deviceId) })
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
