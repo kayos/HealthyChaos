@@ -1,9 +1,7 @@
-package com.kayos.healthykayos.sensor
+package com.kayos.polar
 
 import android.content.Context
 import android.util.Log
-import com.kayos.polar.HeartRate
-import com.kayos.polar.IHeartRateSensor
 import com.polar.androidcommunications.api.ble.model.DisInfo
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiCallback

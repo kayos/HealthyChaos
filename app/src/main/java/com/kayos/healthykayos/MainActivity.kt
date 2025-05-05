@@ -8,7 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
-import com.kayos.healthykayos.sensor.PolarHeartRateSensor
+import com.kayos.polar.PolarHeartRateSensor
 import com.polar.sdk.api.PolarBleApiDefaultImpl
 
 class MainActivity : AppCompatActivity() {

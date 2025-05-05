@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
-import com.kayos.healthykayos.sensor.PolarHeartRateSensor
+import com.kayos.polar.PolarHeartRateSensor
 import com.polar.sdk.api.model.PolarDeviceInfo
 
 class ConnectionFragment : Fragment() {
