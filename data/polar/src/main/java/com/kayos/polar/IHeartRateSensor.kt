@@ -14,8 +14,8 @@ interface IHeartRateSensor {
     val heartRate: StateFlow<HeartRate?>
 
     fun search()
-    fun connect(device: PolarDeviceInfo): Unit
-    fun disconnect(id: String): Unit
+    fun connect(device: PolarDeviceInfo)
+    fun disconnect(id: String)
 
     fun startHR(id: String): Flowable<PolarHrData>
 

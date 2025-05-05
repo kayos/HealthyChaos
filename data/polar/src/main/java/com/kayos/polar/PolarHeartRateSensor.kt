@@ -24,44 +24,45 @@ import kotlinx.coroutines.rx3.await
 import java.time.Instant
 import java.util.UUID
 
-class PolarHeartRateSensor private constructor(context: Context): IHeartRateSensor {
+class PolarHeartRateSensor private constructor(context: Context) : IHeartRateSensor {
 
-    private  var searchDisposable : Disposable? = null
+    private var searchDisposable: Disposable? = null
     private val _availableDevices = MutableStateFlow<List<PolarDeviceInfo>>(emptyList())
     val availableDevices: StateFlow<List<PolarDeviceInfo>> get() = _availableDevices
 
     private val _connectedDevices = MutableStateFlow<PolarDeviceInfo?>(null)
     val connectedDevices: StateFlow<PolarDeviceInfo?> get() = _connectedDevices
 
-    private var heartRateDisposable : Disposable? = null
+    private var heartRateDisposable: Disposable? = null
     private val _heartRate = MutableStateFlow<HeartRate?>(null)
     override val heartRate: StateFlow<HeartRate?> get() = _heartRate
 
     // TODO: set this when specific device is connected, rethink sharing between fragments
-    var selectedDeviceId : String? = null
+    var selectedDeviceId: String? = null
 
     val hrSampleRateSec = 1
 
     //TODO make private once refactor is done
     val api: PolarBleApi = PolarBleApiDefaultImpl.defaultImplementation(
-            context,
-            setOf(
-                PolarBleApi.PolarBleSdkFeature.FEATURE_HR,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_SDK_MODE,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_BATTERY_INFO,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_OFFLINE_RECORDING,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_ONLINE_STREAMING,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_DEVICE_INFO,
-                PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_LED_ANIMATION
-            )
+        context,
+        setOf(
+            PolarBleApi.PolarBleSdkFeature.FEATURE_HR,
+            PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_SDK_MODE,
+            PolarBleApi.PolarBleSdkFeature.FEATURE_BATTERY_INFO,
+            PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_OFFLINE_RECORDING,
+            PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_ONLINE_STREAMING,
+            PolarBleApi.PolarBleSdkFeature.FEATURE_DEVICE_INFO,
+            PolarBleApi.PolarBleSdkFeature.FEATURE_POLAR_LED_ANIMATION
         )
+    )
 
     companion object {
         private const val TAG = "PolarHeartRateSensor"
+
         @Volatile
         private var instance: PolarHeartRateSensor? = null
 
-        fun getInstance(context : Context) =
+        fun getInstance(context: Context) =
             instance ?: synchronized(this) {
                 instance ?: PolarHeartRateSensor(context).also { instance = it }
             }
@@ -103,7 +104,10 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
                 Log.d(TAG, "BATTERY LEVEL: $level")
             }
 
-            override fun hrNotificationReceived(identifier: String, data: PolarHrData.PolarHrSample) {
+            override fun hrNotificationReceived(
+                identifier: String,
+                data: PolarHrData.PolarHrSample
+            ) {
                 // deprecated
             }
 
@@ -119,13 +123,13 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
     override fun search() {
         _availableDevices.value = emptyList<PolarDeviceInfo>()
 
-        api.setPolarFilter(true);
+        api.setPolarFilter(true)
 
         searchDisposable?.dispose()
         searchDisposable = api.searchForDevice()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = {  polarDeviceInfo: PolarDeviceInfo ->
+                onNext = { polarDeviceInfo: PolarDeviceInfo ->
                     _availableDevices.value = _availableDevices.value + polarDeviceInfo
                     Log.d(TAG, "Found Device: ${polarDeviceInfo.name}")
                 },
@@ -169,27 +173,27 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
     }
 
     override suspend fun isRecording(): Boolean {
-        return api.getOfflineRecordingStatus(selectedDeviceId!!).map {
-            runningRecordings -> runningRecordings.contains(PolarBleApi.PolarDeviceDataType.HR)
+        return api.getOfflineRecordingStatus(selectedDeviceId!!).map { runningRecordings ->
+            runningRecordings.contains(PolarBleApi.PolarDeviceDataType.HR)
         }.await()
     }
 
     override fun startHeartRateStream() {
-       heartRateDisposable?.dispose()
-       heartRateDisposable = api.startHrStreaming(selectedDeviceId!!)
-           .flatMap{data -> Flowable.fromIterable(data.samples)}
-           .map{sample -> HeartRate(Instant.now(), sample.hr)}
-           .subscribeBy(
-               onNext = {  heartRate: HeartRate ->
-                   _heartRate.value = heartRate
-               },
-               onError = { error: Throwable ->
-                   Log.e(TAG, "Failed streaming heart rate: $error")
-               },
-               onComplete = {
-                   Log.d(TAG, "Done streaming heart rate")
-               }
-           )
+        heartRateDisposable?.dispose()
+        heartRateDisposable = api.startHrStreaming(selectedDeviceId!!)
+            .flatMap { data -> Flowable.fromIterable(data.samples) }
+            .map { sample -> HeartRate(Instant.now(), sample.hr) }
+            .subscribeBy(
+                onNext = { heartRate: HeartRate ->
+                    _heartRate.value = heartRate
+                },
+                onError = { error: Throwable ->
+                    Log.e(TAG, "Failed streaming heart rate: $error")
+                },
+                onComplete = {
+                    Log.d(TAG, "Done streaming heart rate")
+                }
+            )
     }
 
     override fun stopHeartRateStream() {
@@ -199,8 +203,8 @@ class PolarHeartRateSensor private constructor(context: Context): IHeartRateSens
 
     override fun listRecordings(): Flow<List<PolarOfflineRecordingEntry>> {
         val recordings = mutableListOf<PolarOfflineRecordingEntry>()
-        return api.listOfflineRecordings(selectedDeviceId!!).map{
-            entry -> recordings.add(entry)
+        return api.listOfflineRecordings(selectedDeviceId!!).map { entry ->
+            recordings.add(entry)
             recordings.toList()
         }.asFlow()
     }
