@@ -15,9 +15,9 @@ interface IHeartRateSensor {
 
     fun search()
     fun connect(deviceId: String)
-    fun disconnect(id: String)
+    fun disconnect(deviceId: String)
 
-    fun startHR(id: String): Flowable<PolarHrData>
+    fun startHR(deviceId: String): Flowable<PolarHrData>
 
     fun listRecordings(): Flow<List<PolarOfflineRecordingEntry>>
     fun startRecording(): Completable
