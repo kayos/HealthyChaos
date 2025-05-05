@@ -1,4 +1,4 @@
-package com.kayos.healthykayos.sensor
+package com.kayos.polar
 
 import java.time.Instant
 

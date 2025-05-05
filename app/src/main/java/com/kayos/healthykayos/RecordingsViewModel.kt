@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kayos.healthykayos.sensor.HeartRateProviderFactory
-import com.kayos.healthykayos.sensor.IHeartRateSensor
+import com.kayos.polar.IHeartRateSensor
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.Dispatchers

@@ -1,7 +1,7 @@
 package com.kayos.healthykayos.doubles
 
-import com.kayos.healthykayos.sensor.HeartRate
-import com.kayos.healthykayos.sensor.IHeartRateSensor
+import com.kayos.polar.HeartRate
+import com.kayos.polar.IHeartRateSensor
 import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOfflineRecordingData

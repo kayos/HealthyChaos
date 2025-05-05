@@ -30,9 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.kayos.healthykayos.sensor.HeartRate
+import com.kayos.polar.HeartRate
 import java.time.Instant
 
 class HeartRateStreamFragment : Fragment() {

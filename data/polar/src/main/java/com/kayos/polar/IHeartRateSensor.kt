@@ -1,4 +1,4 @@
-package com.kayos.healthykayos.sensor
+package com.kayos.polar
 
 import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHrData

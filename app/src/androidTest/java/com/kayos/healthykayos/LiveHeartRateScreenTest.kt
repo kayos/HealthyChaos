@@ -6,7 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.kayos.healthykayos.sensor.HeartRate
+import com.kayos.polar.HeartRate
 import junit.framework.TestCase.assertTrue
 import org.junit.Rule
 import org.junit.Test

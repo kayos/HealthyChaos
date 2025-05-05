@@ -3,8 +3,8 @@ package com.kayos.healthykayos
 import app.cash.turbine.test
 import com.kayos.healthykayos.doubles.FailingSensorStub
 import com.kayos.healthykayos.doubles.SensorStub
-import com.kayos.healthykayos.sensor.IHeartRateSensor
 import com.kayos.healthykayos.testutils.MainDispatcherRule
+import com.kayos.polar.IHeartRateSensor
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
