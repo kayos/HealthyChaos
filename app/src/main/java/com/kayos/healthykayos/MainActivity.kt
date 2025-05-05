@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.kayos.healthykayos.sensor.HeartRateProviderFactory
+import com.kayos.polar.HeartRateProviderFactory
 import com.kayos.polar.PolarHeartRateSensor
 import com.polar.sdk.api.PolarBleApiDefaultImpl
 

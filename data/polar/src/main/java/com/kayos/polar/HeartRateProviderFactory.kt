@@ -1,7 +1,6 @@
-package com.kayos.healthykayos.sensor
+package com.kayos.polar
 
 import android.content.Context
-import com.kayos.polar.PolarHeartRateSensor
 
 object HeartRateProviderFactory {
     @JvmStatic
