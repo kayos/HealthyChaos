@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.flowOf
 class SensorStub(override val heartRate: StateFlow<HeartRate?>) : IHeartRateSensor {
 
     override val availableDevices: StateFlow<List<PolarDeviceInfo>> = MutableStateFlow(emptyList())
+    override val connectedDevices: StateFlow<PolarDeviceInfo?> = MutableStateFlow(null)
 
     var isRecording: Boolean = false
 

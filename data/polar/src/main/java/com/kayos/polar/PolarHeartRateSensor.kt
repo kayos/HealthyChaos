@@ -31,7 +31,7 @@ class PolarHeartRateSensor private constructor(context: Context) : IHeartRateSen
     override val availableDevices: StateFlow<List<PolarDeviceInfo>> get() = _availableDevices
 
     private val _connectedDevices = MutableStateFlow<PolarDeviceInfo?>(null)
-    val connectedDevices: StateFlow<PolarDeviceInfo?> get() = _connectedDevices
+    override val connectedDevices: StateFlow<PolarDeviceInfo?> get() = _connectedDevices
 
     private var heartRateDisposable: Disposable? = null
     private val _heartRate = MutableStateFlow<HeartRate?>(null)

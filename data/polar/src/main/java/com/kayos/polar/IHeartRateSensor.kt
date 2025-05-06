@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 interface IHeartRateSensor {
     val heartRate: StateFlow<HeartRate?>
     val availableDevices: StateFlow<List<PolarDeviceInfo>>
+    val connectedDevices: StateFlow<PolarDeviceInfo?>
 
     fun search()
     fun connect(deviceId: String)
