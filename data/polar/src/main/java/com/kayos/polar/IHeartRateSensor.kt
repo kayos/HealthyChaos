@@ -9,7 +9,9 @@ import io.reactivex.rxjava3.core.Flowable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-// TODO: remove any reference to Polar stuff to make this a more generic interface
+/*** TODO Make interface more generic, tricky to do with only one type example
+ * waiting to see what use-cases need and other devices offer
+ * */
 interface IHeartRateSensor {
     val heartRate: StateFlow<HeartRate?>
     val availableDevices: StateFlow<List<PolarDeviceInfo>>
