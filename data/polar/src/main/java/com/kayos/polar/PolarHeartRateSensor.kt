@@ -24,7 +24,7 @@ import kotlinx.coroutines.rx3.await
 import java.time.Instant
 import java.util.UUID
 
-class PolarHeartRateSensor private constructor(context: Context) : IHeartRateSensor {
+internal class PolarHeartRateSensor private constructor(context: Context) : IHeartRateSensor {
 
     private var searchDisposable: Disposable? = null
     private val _availableDevices = MutableStateFlow<List<PolarDeviceInfo>>(emptyList())

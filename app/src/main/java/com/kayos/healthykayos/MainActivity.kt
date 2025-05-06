@@ -8,7 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.kayos.polar.HeartRateProviderFactory
-import com.kayos.polar.PolarHeartRateSensor
+import com.kayos.polar.IHeartRateSensor
 import com.polar.sdk.api.PolarBleApiDefaultImpl
 
 class MainActivity : AppCompatActivity() {
@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         private const val PERMISSION_REQUEST_CODE = 1
     }
 
-    private val sensor: PolarHeartRateSensor by lazy {
+    private val sensor: IHeartRateSensor by lazy {
         HeartRateProviderFactory.getPolarHeartRateSensor(applicationContext)
     }
 
@@ -26,12 +26,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.d(TAG, "version: " + PolarBleApiDefaultImpl.versionInfo())
-
-        // If there is need to log what is happening inside the SDK, it can be enabled like this:
-        val enableSdkLogs = false
-        if(enableSdkLogs) {
-            sensor.api.setApiLogger { s: String -> Log.d(API_LOGGER_TAG, s) }
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

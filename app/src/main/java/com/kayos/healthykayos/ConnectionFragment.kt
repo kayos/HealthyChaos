@@ -30,12 +30,12 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.kayos.polar.HeartRateProviderFactory
-import com.kayos.polar.PolarHeartRateSensor
+import com.kayos.polar.IHeartRateSensor
 import com.polar.sdk.api.model.PolarDeviceInfo
 
 class ConnectionFragment : Fragment() {
 
-    private val sensor: PolarHeartRateSensor by lazy {
+    private val sensor: IHeartRateSensor by lazy {
         HeartRateProviderFactory.getPolarHeartRateSensor(requireActivity().applicationContext)
     }
 
@@ -69,7 +69,7 @@ class ConnectionFragment : Fragment() {
 
 @Composable
 fun Connections(
-    sensor: PolarHeartRateSensor,
+    sensor: IHeartRateSensor,
     onRecordingsClick: () -> Unit,
     onLiveClick: () -> Unit)
 {
