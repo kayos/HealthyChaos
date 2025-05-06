@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 class FailingSensorStub() : IHeartRateSensor {
     override val heartRate: StateFlow<HeartRate?> = MutableStateFlow(null)
-     val recordings: StateFlow<List<PolarOfflineRecordingEntry>> = MutableStateFlow(emptyList())
+    override val availableDevices: StateFlow<List<PolarDeviceInfo>> = MutableStateFlow(emptyList())
+
+    val recordings: StateFlow<List<PolarOfflineRecordingEntry>> = MutableStateFlow(emptyList())
 
     var isRecording: Boolean = false
 
