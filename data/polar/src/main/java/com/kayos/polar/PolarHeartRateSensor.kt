@@ -151,6 +151,10 @@ class PolarHeartRateSensor private constructor(context: Context) : IHeartRateSen
         api.disconnectFromDevice(deviceId)
     }
 
+    override fun dispose(){
+        api.shutDown()
+    }
+
     override fun startHR(deviceId: String): Flowable<PolarHrData> {
         return api.startHrStreaming(deviceId)
     }

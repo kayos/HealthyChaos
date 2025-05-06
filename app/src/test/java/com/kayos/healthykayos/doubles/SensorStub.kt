@@ -32,6 +32,10 @@ class SensorStub(override val heartRate: StateFlow<HeartRate?>) : IHeartRateSens
         TODO("Not yet implemented")
     }
 
+    override fun dispose(){
+        TODO("Not yet implemented")
+    }
+
     override fun startHR(id: String): Flowable<PolarHrData> {
         TODO("Not yet implemented")
     }

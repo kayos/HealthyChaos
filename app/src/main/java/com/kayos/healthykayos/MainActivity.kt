@@ -64,14 +64,9 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    public override fun onResume() {
-        super.onResume()
-        sensor.api.foregroundEntered()
-    }
-
     public override fun onDestroy() {
         super.onDestroy()
-        sensor.api.shutDown()
+        sensor.dispose()
     }
 
     private fun showToast(message: String) {
