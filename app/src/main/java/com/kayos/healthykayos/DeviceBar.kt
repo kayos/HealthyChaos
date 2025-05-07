@@ -13,12 +13,26 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 
 @Composable
-@Preview
-internal fun DeviceBar(){
+internal fun DeviceBar(viewModel: DeviceBarViewModel = DeviceBarViewModel()) {
+    val device by viewModel.connectedDevice.collectAsStateWithLifecycle()
+
+    DeviceBar(device = device)
+}
+
+@Composable
+internal fun DeviceBar(device: Device?){
     TopAppBar(
-        title = { Text("No device") },
+        title = {
+            if(device == null){
+                Text("No Device", modifier = Modifier.testTag("test-no-device-text"))
+            }
+        },
         actions = {
             IconButton(onClick = { /* TODO: go to connection screen */ }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Connect Device")
@@ -30,4 +44,10 @@ internal fun DeviceBar(){
             actionIconContentColor = Color.White
         )
     )
+}
+
+@Preview
+@Composable
+private fun NoDevicePreview(){
+    DeviceBar()
 }
