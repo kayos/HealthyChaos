@@ -125,7 +125,7 @@ internal class PolarHeartRateSensor private constructor(context: Context) : IHea
 
         val devices =  mutableListOf<Device>()
         return api.searchForDevice().map { entry ->
-            devices.add(Device(entry.deviceId))
+            devices.add(Device(entry.deviceId, entry.name))
             devices.toList()
         }.asFlow()
     }
