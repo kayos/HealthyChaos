@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
 import com.kayos.healthykayos.ConnectionViewModel
 import com.kayos.polar.HeartRateProviderFactory
@@ -61,7 +62,7 @@ class ConnectionFragment : Fragment() {
                         onLiveClick = {
                             findNavController().navigate(R.id.action_ConnectionFragment_to_HeartRateStreamFragment)
                         },
-                        viewModel = ConnectionViewModel()
+                        viewModel = viewModel(factory = ConnectionViewModel.Factory)
                     )
                 }
             }
@@ -75,7 +76,7 @@ class ConnectionFragment : Fragment() {
 fun Connections(sensor: IHeartRateSensor,
                 onRecordingsClick: () -> Unit,
                 onLiveClick: () -> Unit,
-                viewModel: ConnectionViewModel = ConnectionViewModel()){
+                viewModel: ConnectionViewModel = viewModel(factory = ConnectionViewModel.Factory)){
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Connections(sensor, onRecordingsClick, onLiveClick)
 }
