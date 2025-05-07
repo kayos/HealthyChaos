@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
+import com.kayos.healthykayos.ConnectionViewModel
 import com.kayos.polar.HeartRateProviderFactory
 import com.kayos.polar.IHeartRateSensor
 import com.polar.sdk.api.model.PolarDeviceInfo
@@ -60,6 +61,7 @@ class ConnectionFragment : Fragment() {
                         onLiveClick = {
                             findNavController().navigate(R.id.action_ConnectionFragment_to_HeartRateStreamFragment)
                         },
+                        viewModel = ConnectionViewModel()
                     )
                 }
             }
@@ -70,15 +72,20 @@ class ConnectionFragment : Fragment() {
 }
 
 @Composable
-fun Connections(viewModel: ConnectionViewModel = ConnectionViewModel()){
+fun Connections(sensor: IHeartRateSensor,
+                onRecordingsClick: () -> Unit,
+                onLiveClick: () -> Unit,
+                viewModel: ConnectionViewModel = ConnectionViewModel()){
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    Connections(sensor, onRecordingsClick, onLiveClick)
 }
 
 @Composable
 fun Connections(
     sensor: IHeartRateSensor,
     onRecordingsClick: () -> Unit,
-    onLiveClick: () -> Unit)
+    onLiveClick: () -> Unit
+)
 {
     val availableDevices = sensor.availableDevices.collectAsState().value
     val connectedDevice = sensor.connectedDevices.collectAsState().value
