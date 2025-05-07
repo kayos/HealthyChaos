@@ -1,5 +1,6 @@
 package com.kayos.healthykayos.doubles
 
+import com.kayos.polar.Device
 import com.kayos.polar.HeartRate
 import com.kayos.polar.IHeartRateSensor
 import com.polar.sdk.api.model.PolarDeviceInfo
@@ -22,6 +23,10 @@ class FailingSensorStub() : IHeartRateSensor {
     var isRecording: Boolean = false
 
     override fun search() {
+        TODO("Not yet implemented")
+    }
+
+    override fun searchV2(): Flow<List<Device>> {
         TODO("Not yet implemented")
     }
 
