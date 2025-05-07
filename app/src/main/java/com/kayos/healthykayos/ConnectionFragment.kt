@@ -6,9 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,10 +30,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
-import com.kayos.healthykayos.ConnectionViewModel
+import com.kayos.polar.Device
 import com.kayos.polar.HeartRateProviderFactory
 import com.kayos.polar.IHeartRateSensor
-import com.polar.sdk.api.model.PolarDeviceInfo
 
 class ConnectionFragment : Fragment() {
 
@@ -78,53 +75,48 @@ fun Connections(sensor: IHeartRateSensor,
                 onLiveClick: () -> Unit,
                 viewModel: ConnectionViewModel = viewModel(factory = ConnectionViewModel.Factory)){
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Connections(sensor, onRecordingsClick, onLiveClick)
+
+    Connections(sensor, onRecordingsClick, onLiveClick, uiState)
 }
 
 @Composable
 fun Connections(
     sensor: IHeartRateSensor,
     onRecordingsClick: () -> Unit,
-    onLiveClick: () -> Unit
+    onLiveClick: () -> Unit,
+    uiState: ConnectionUiState
 )
 {
-    val availableDevices = sensor.availableDevices.collectAsState().value
     val connectedDevice = sensor.connectedDevices.collectAsState().value
 
     Column {
         Button(onClick = {
-            sensor.search()
+            sensor.searchV2()
         }) {
             Text("Scan Devices")
         }
         Column {
-            availableDevices.forEach { device ->
-                DeviceItem(device, onClick = { sensor.connect(device.deviceId) })
+            uiState.availableDevices.forEach { device ->
+                DeviceItem(device, onClick = { sensor.connect(device.id) })
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         if (connectedDevice != null)
-            Device(connectedDevice, onRecordingsClick, onLiveClick)
+            Device(Device(connectedDevice.deviceId, connectedDevice.name), onRecordingsClick, onLiveClick)
     }
 }
 
 @Composable
-fun Device(device: PolarDeviceInfo, onRecordingsClick: () -> Unit, onLiveClick: () -> Unit) {
+fun Device(device: Device, onRecordingsClick: () -> Unit, onLiveClick: () -> Unit) {
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)
         .background(Color.LightGray)) {
 
-        Text("Sensor: ${device.deviceId}", style = MaterialTheme.typography.titleLarge)
+        Text("Sensor: ${device.id}", style = MaterialTheme.typography.titleLarge)
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Signal strength: ${device.rssi}", style = MaterialTheme.typography.bodyMedium)
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
 
         Column {
             Button(
@@ -145,7 +137,7 @@ fun Device(device: PolarDeviceInfo, onRecordingsClick: () -> Unit, onLiveClick: 
 }
 
 @Composable
-fun DeviceItem(device: PolarDeviceInfo, onClick: () -> Unit) {
+fun DeviceItem(device: Device, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -161,7 +153,7 @@ fun DeviceItem(device: PolarDeviceInfo, onClick: () -> Unit) {
                 Text(text = device.name, style = MaterialTheme.typography.bodyLarge)
             },
             supportingContent = {
-                Text(text = "Id: ${device.deviceId} | Address: ${device.address}", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Id: ${device.id}", style = MaterialTheme.typography.bodyMedium)
             }
         )
     }
