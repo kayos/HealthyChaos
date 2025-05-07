@@ -1,6 +1,7 @@
 package com.kayos.healthykayos
 
 import androidx.lifecycle.ViewModel
+import com.kayos.polar.Device
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

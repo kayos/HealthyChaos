@@ -11,12 +11,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kayos.polar.Device
 
 @Composable
 internal fun DeviceBar(viewModel: DeviceBarViewModel = DeviceBarViewModel()) {
@@ -34,7 +35,8 @@ internal fun DeviceBar(device: Device?){
             }
         },
         actions = {
-            IconButton(onClick = { /* TODO: go to connection screen */ }) {
+            IconButton(onClick = {
+            }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Connect Device")
             }
         },
