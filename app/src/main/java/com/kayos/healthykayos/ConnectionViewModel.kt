@@ -2,17 +2,41 @@ package com.kayos.healthykayos
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kayos.polar.HeartRateProviderFactory
 import com.kayos.polar.IHeartRateSensor
+import com.kayos.polar.Device
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
-class ConnectionViewModel(sensor : IHeartRateSensor): ViewModel() {
-    private val _uiState = MutableStateFlow(ConnectionUiState())
-    val uiState: StateFlow<ConnectionUiState> = _uiState
 
+class ConnectionViewModel(sensor: IHeartRateSensor) : ViewModel() {
+    private val _shouldSearch = MutableStateFlow(false)
+    private val _availableDevices: Flow<List<Device>> = _shouldSearch.flatMapLatest {
+        shouldSearch ->
+            if (shouldSearch) sensor.searchV2()
+            else flowOf(emptyList<Device>())
+    }
+
+    val uiState: StateFlow<ConnectionUiState> = _availableDevices.map{
+        available, -> ConnectionUiState(available)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = ConnectionUiState(),
+    )
+
+    fun search(){
+        _shouldSearch.value = true
+    }
 
     companion object {
         private const val TAG = "ConnectionViewModel"
@@ -27,6 +51,6 @@ class ConnectionViewModel(sensor : IHeartRateSensor): ViewModel() {
     }
 }
 
-class ConnectionUiState {
+data class ConnectionUiState(val availableDevices : List<Device> = emptyList()) {
 
 }
