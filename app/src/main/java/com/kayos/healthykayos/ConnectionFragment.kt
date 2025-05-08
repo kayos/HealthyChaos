@@ -91,7 +91,7 @@ fun Connections(
 
     Column {
         Button(onClick = {
-            sensor.searchV2()
+            sensor.search()
         }) {
             Text("Scan Devices")
         }

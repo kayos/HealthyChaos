@@ -36,7 +36,7 @@ class ConnectionViewModelTest {
     fun search_uiStateContainsFoundDevices() = runTest {
         val expected = listOf(Device("1", "name"))
         val sensorStub = mock<IHeartRateSensor> {
-            on { searchV2() } doReturn flowOf(expected)
+            on { search() } doReturn flowOf(expected)
         }
 
         val viewModel = ConnectionViewModel(

@@ -119,7 +119,7 @@ internal class PolarHeartRateSensor private constructor(context: Context) : IHea
         })
     }
 
-    override fun searchV2(): Flow<List<Device>> {
+    override fun search(): Flow<List<Device>> {
         api.setPolarFilter(true)
 
         val devices =  mutableListOf<Device>()

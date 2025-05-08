@@ -22,7 +22,7 @@ class ConnectionViewModel(sensor: IHeartRateSensor) : ViewModel() {
     private val _shouldSearch = MutableStateFlow(false)
     private val _availableDevices: Flow<List<Device>> = _shouldSearch.flatMapLatest {
         shouldSearch ->
-            if (shouldSearch) sensor.searchV2()
+            if (shouldSearch) sensor.search()
             else flowOf(emptyList<Device>())
     }
 

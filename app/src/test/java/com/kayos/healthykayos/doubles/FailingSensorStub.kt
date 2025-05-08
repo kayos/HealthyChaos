@@ -22,7 +22,7 @@ class FailingSensorStub() : IHeartRateSensor {
 
     var isRecording: Boolean = false
 
-    override fun searchV2(): Flow<List<Device>> {
+    override fun search(): Flow<List<Device>> {
         TODO("Not yet implemented")
     }
 

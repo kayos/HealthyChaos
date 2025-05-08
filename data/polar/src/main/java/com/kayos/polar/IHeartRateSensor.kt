@@ -17,7 +17,7 @@ interface IHeartRateSensor {
     val availableDevices: StateFlow<List<PolarDeviceInfo>>
     val connectedDevices: StateFlow<PolarDeviceInfo?>
 
-    fun searchV2(): Flow<List<Device>>
+    fun search(): Flow<List<Device>>
     fun connect(deviceId: String)
     fun disconnect(deviceId: String)
     fun dispose()
