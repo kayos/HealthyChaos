@@ -11,7 +11,6 @@ import com.polar.sdk.api.model.PolarHealthThermometerData
 import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -128,29 +127,6 @@ internal class PolarHeartRateSensor private constructor(context: Context) : IHea
             devices.add(Device(entry.deviceId, entry.name))
             devices.toList()
         }.asFlow()
-    }
-
-    override fun search() {
-        _availableDevices.value = emptyList<PolarDeviceInfo>()
-
-        api.setPolarFilter(true)
-
-        searchDisposable?.dispose()
-        searchDisposable = api.searchForDevice()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { polarDeviceInfo: PolarDeviceInfo ->
-                    _availableDevices.value = _availableDevices.value + polarDeviceInfo
-                    Log.d(TAG, "Found Device: ${polarDeviceInfo.name}")
-                },
-                onError = { error: Throwable ->
-                    Log.e(TAG, "Failed to search: $error")
-                },
-                onComplete = {
-                    searchDisposable?.dispose()
-                    Log.d(TAG, "Done searching for devices")
-                }
-            )
     }
 
     override fun connect(deviceId: String) {

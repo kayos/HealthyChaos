@@ -20,10 +20,6 @@ class SensorStub(override val heartRate: StateFlow<HeartRate?>) : IHeartRateSens
 
     var isRecording: Boolean = false
 
-    override fun search() {
-        TODO("Not yet implemented")
-    }
-
     override fun searchV2(): Flow<List<com.kayos.polar.Device>> {
         TODO("Not yet implemented")
     }
