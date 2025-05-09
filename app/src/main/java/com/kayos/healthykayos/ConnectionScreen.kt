@@ -28,15 +28,14 @@ fun ConnectionScreen(
     sensor: IHeartRateSensor,
     onRecordingsClick: () -> Unit,
     onLiveClick: () -> Unit,
+    onSearchClick: () -> Unit,
     uiState: ConnectionUiState
 )
 {
     val connectedDevice = sensor.connectedDevices.collectAsState().value
 
     Column {
-        Button(onClick = {
-            sensor.search()
-        }) {
+        Button(onClick = onSearchClick) {
             Text("Scan Devices")
         }
         Column {
