@@ -29,6 +29,7 @@ fun ConnectionScreen(
     onRecordingsClick: () -> Unit,
     onLiveClick: () -> Unit,
     onSearchClick: () -> Unit,
+    onConnectClick: (deviceId: String) -> Unit,
     uiState: ConnectionUiState
 )
 {
@@ -38,7 +39,7 @@ fun ConnectionScreen(
         }
         Column {
             uiState.availableDevices.forEach { device ->
-                DeviceItem(device, onClick = { sensor.connect(device.id) })
+                DeviceItem(device, onClick = { onConnectClick(device.id)})
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
