@@ -49,12 +49,12 @@ class FailingSensorStub() : IHeartRateSensor {
 
     override fun startRecording(): Completable {
         isRecording = false
-        return Completable.error(Throwable())
+        return Completable.error(Exception("Oops"))
     }
 
     override fun stopRecording(): Completable {
         isRecording = true //assume failed to stop
-        return Completable.error(Throwable())
+        return Completable.error(Exception("Oops"))
     }
 
     override suspend fun deleteRecording(entry: PolarOfflineRecordingEntry) {
