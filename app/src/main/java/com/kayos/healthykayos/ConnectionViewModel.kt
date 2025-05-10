@@ -18,15 +18,15 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 
 
-class ConnectionViewModel(sensor: IHeartRateSensor) : ViewModel() {
+class ConnectionViewModel(private val _sensor: IHeartRateSensor) : ViewModel() {
     private val _shouldSearch = MutableStateFlow(false)
     private val _availableDevices: Flow<List<Device>> = _shouldSearch.flatMapLatest {
         shouldSearch ->
-            if (shouldSearch) sensor.search()
+            if (shouldSearch) _sensor.search()
             else flowOf(emptyList<Device>())
     }
 
-    private val _connectedDevice : Flow<Device?> = sensor.connectedDevice.stateIn(
+    private val _connectedDevice : Flow<Device?> = _sensor.connectedDevice.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
         initialValue = null,
@@ -45,13 +45,17 @@ class ConnectionViewModel(sensor: IHeartRateSensor) : ViewModel() {
         _shouldSearch.value = true
     }
 
+    fun connect(deviceId: String) {
+        _sensor.connect(deviceId)
+    }
+
     companion object {
         private const val TAG = "ConnectionViewModel"
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = checkNotNull(this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
                 ConnectionViewModel(
-                    sensor = HeartRateProviderFactory.getPolarHeartRateSensor(application.applicationContext)
+                    _sensor = HeartRateProviderFactory.getPolarHeartRateSensor(application.applicationContext)
                 )
             }
         }

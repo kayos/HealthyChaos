@@ -24,7 +24,7 @@ class ConnectionViewModelTest {
     @Test
     fun onInitialisation_noDevicesAvailable() = runTest {
         val viewModel = ConnectionViewModel(
-            sensor = SensorStub(MutableStateFlow(null))
+            _sensor = SensorStub(MutableStateFlow(null))
         )
 
         viewModel.uiState.test {
@@ -44,7 +44,7 @@ class ConnectionViewModelTest {
         }
 
         val viewModel = ConnectionViewModel(
-            sensor = sensorStub
+            _sensor = sensorStub
         )
 
         viewModel.uiState.test {

@@ -56,12 +56,13 @@ fun ConnectionScreen(sensor: IHeartRateSensor,
                      onRecordingsClick: () -> Unit,
                      onLiveClick: () -> Unit,
                      viewModel: ConnectionViewModel = viewModel(factory = ConnectionViewModel.Factory)){
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ConnectionScreen(sensor,
         onRecordingsClick,
         onLiveClick,
-        onSearchClick = {viewModel.search()},
-        onConnectClick = { id -> sensor.connect(id) },
+        onSearchClick = { viewModel.search() },
+        onConnectClick = { id -> viewModel.connect(id) },
         uiState)
 }
