@@ -32,8 +32,6 @@ fun ConnectionScreen(
     uiState: ConnectionUiState
 )
 {
-    val connectedDevice = sensor.connectedDevices.collectAsState().value
-
     Column {
         Button(onClick = onSearchClick) {
             Text("Scan Devices")
@@ -45,8 +43,8 @@ fun ConnectionScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (connectedDevice != null)
-            Device(Device(connectedDevice.deviceId, connectedDevice.name), onRecordingsClick, onLiveClick)
+        if (uiState.connectedDevice != null)
+            Device(uiState.connectedDevice, onRecordingsClick, onLiveClick)
     }
 }
 
