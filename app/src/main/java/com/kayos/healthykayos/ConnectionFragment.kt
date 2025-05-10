@@ -13,14 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
-import com.kayos.polar.HeartRateProviderFactory
-import com.kayos.polar.IHeartRateSensor
 
 class ConnectionFragment : Fragment() {
-
-    private val sensor: IHeartRateSensor by lazy {
-        HeartRateProviderFactory.getPolarHeartRateSensor(requireActivity().applicationContext)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,7 +28,6 @@ class ConnectionFragment : Fragment() {
             setContent {
                 MaterialTheme {
                     ConnectionScreen(
-                        sensor,
                         onRecordingsClick = {
                             findNavController().navigate(R.id.action_ConnectionFragment_to_RecordingsFragment)
                         },
@@ -52,14 +45,13 @@ class ConnectionFragment : Fragment() {
 }
 
 @Composable
-fun ConnectionScreen(sensor: IHeartRateSensor,
-                     onRecordingsClick: () -> Unit,
+fun ConnectionScreen(onRecordingsClick: () -> Unit,
                      onLiveClick: () -> Unit,
                      viewModel: ConnectionViewModel = viewModel(factory = ConnectionViewModel.Factory)){
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    ConnectionScreen(sensor,
+    ConnectionScreen(
         onRecordingsClick,
         onLiveClick,
         onSearchClick = { viewModel.search() },
