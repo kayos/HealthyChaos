@@ -8,7 +8,7 @@ import androidx.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun MainScreen() {
+fun AppScreen() {
     Scaffold(
         topBar = {DeviceBar()},
         content = { _ -> HomeScreen() }
