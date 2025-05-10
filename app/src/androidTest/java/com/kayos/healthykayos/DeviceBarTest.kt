@@ -16,7 +16,8 @@ class DeviceBarTest {
     fun whenDeviceNotConnected_ShowsTextToShowNoConnection() {
         composeTestRule.setContent {
             DeviceBar(
-                device = null
+                device = null,
+                onAddDeviceClick = {}
             )
         }
 
@@ -29,7 +30,8 @@ class DeviceBarTest {
     fun whenDeviceNotConnected_hidesNotConnectedText() {
         composeTestRule.setContent {
             DeviceBar(
-                device = Device("123", "name")
+                device = Device("123", "name"),
+                onAddDeviceClick = {}
             )
         }
 

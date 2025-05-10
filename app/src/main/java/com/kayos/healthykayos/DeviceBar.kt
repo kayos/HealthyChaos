@@ -20,14 +20,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kayos.polar.Device
 
 @Composable
-internal fun DeviceBar(viewModel: DeviceBarViewModel = DeviceBarViewModel()) {
+internal fun DeviceBar(onAddDeviceClick: () -> Unit,
+                       viewModel: DeviceBarViewModel = DeviceBarViewModel()) {
     val device by viewModel.connectedDevice.collectAsStateWithLifecycle()
 
-    DeviceBar(device = device)
+    DeviceBar(device = device, onAddDeviceClick)
 }
 
 @Composable
-internal fun DeviceBar(device: Device?){
+internal fun DeviceBar(device: Device?, onAddDeviceClick: () -> Unit,){
     TopAppBar(
         title = {
             if(device == null){
@@ -35,8 +36,7 @@ internal fun DeviceBar(device: Device?){
             }
         },
         actions = {
-            IconButton(onClick = {
-            }) {
+            IconButton(onClick = onAddDeviceClick) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Connect Device")
             }
         },
@@ -51,5 +51,5 @@ internal fun DeviceBar(device: Device?){
 @Preview
 @Composable
 private fun NoDevicePreview(){
-    DeviceBar()
+    DeviceBar({})
 }
