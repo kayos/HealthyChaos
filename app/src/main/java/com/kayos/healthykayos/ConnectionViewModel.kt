@@ -5,16 +5,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.kayos.polar.Device
 import com.kayos.polar.HeartRateProviderFactory
 import com.kayos.polar.IHeartRateSensor
-import com.kayos.polar.Device
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 
@@ -26,8 +26,15 @@ class ConnectionViewModel(sensor: IHeartRateSensor) : ViewModel() {
             else flowOf(emptyList<Device>())
     }
 
-    val uiState: StateFlow<ConnectionUiState> = _availableDevices.map{
-        available, -> ConnectionUiState(available)
+    private val _connectedDevice : Flow<Device?> = sensor.connectedDevice.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = null,
+    )
+
+    val uiState: StateFlow<ConnectionUiState> = combine(_availableDevices, _connectedDevice){
+        available, connectedDevice ->
+        ConnectionUiState(available, connectedDevice)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
@@ -51,6 +58,7 @@ class ConnectionViewModel(sensor: IHeartRateSensor) : ViewModel() {
     }
 }
 
-data class ConnectionUiState(val availableDevices : List<Device> = emptyList()) {
-
-}
+data class ConnectionUiState(
+    val availableDevices: List<Device> = emptyList(),
+    val connectedDevice: Device? = null
+)

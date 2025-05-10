@@ -1,5 +1,6 @@
 package com.kayos.healthykayos.doubles
 
+import com.kayos.polar.Device
 import com.kayos.polar.HeartRate
 import com.kayos.polar.IHeartRateSensor
 import com.polar.sdk.api.model.PolarDeviceInfo
@@ -17,6 +18,7 @@ class SensorStub(override val heartRate: StateFlow<HeartRate?>) : IHeartRateSens
 
     override val availableDevices: StateFlow<List<PolarDeviceInfo>> = MutableStateFlow(emptyList())
     override val connectedDevices: StateFlow<PolarDeviceInfo?> = MutableStateFlow(null)
+    override val connectedDevice: Flow<Device?> = MutableStateFlow(null)
 
     var isRecording: Boolean = false
 

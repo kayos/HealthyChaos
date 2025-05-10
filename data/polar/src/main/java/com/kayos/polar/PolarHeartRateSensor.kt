@@ -5,7 +5,6 @@ import android.util.Log
 import com.polar.androidcommunications.api.ble.model.DisInfo
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiCallback
-import com.polar.sdk.api.PolarBleApiDefaultImpl
 import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHealthThermometerData
 import com.polar.sdk.api.model.PolarHrData
@@ -15,13 +14,14 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx3.await
 import java.time.Instant
-import java.util.UUID
 
 internal class PolarHeartRateSensor private constructor(context: Context) : IHeartRateSensor {
 
@@ -56,16 +56,13 @@ internal class PolarHeartRateSensor private constructor(context: Context) : IHea
             }
     }
 
-    init {
-        api.setApiCallback(object : PolarBleApiCallback() {
-            override fun blePowerStateChanged(powered: Boolean) {
-                Log.d(TAG, "BLE power: $powered")
-            }
-
+    override val connectedDevice : Flow<Device?> = callbackFlow {
+        val callback = object : PolarBleApiCallback() {
             override fun deviceConnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
                 selectedDeviceId = polarDeviceInfo.deviceId
                 _connectedDevices.value = polarDeviceInfo
+                trySend(Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
             }
 
             override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {
@@ -74,22 +71,24 @@ internal class PolarHeartRateSensor private constructor(context: Context) : IHea
 
             override fun deviceDisconnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.deviceId}")
+                selectedDeviceId = null
                 _connectedDevices.value = null
+                trySend(null)
+            }
+
+            override fun batteryLevelReceived(identifier: String, level: Int) {
+                Log.d(TAG, "BATTERY LEVEL: $level")
+            }
+
+            override fun blePowerStateChanged(powered: Boolean) {
+                //don't care
             }
 
             override fun disInformationReceived(
                 identifier: String,
                 disInfo: DisInfo
             ) {
-                TODO("Not yet implemented")
-            }
-
-            override fun disInformationReceived(identifier: String, uuid: UUID, value: String) {
-                Log.d(TAG, "DIS INFO uuid: $uuid value: $value")
-            }
-
-            override fun batteryLevelReceived(identifier: String, level: Int) {
-                Log.d(TAG, "BATTERY LEVEL: $level")
+                // don't care
             }
 
             override fun hrNotificationReceived(
@@ -103,9 +102,15 @@ internal class PolarHeartRateSensor private constructor(context: Context) : IHea
                 identifier: String,
                 data: PolarHealthThermometerData
             ) {
-                TODO("Not yet implemented")
+                // don't care
             }
-        })
+
+        }
+        api.setApiCallback(callback)
+
+        awaitClose {
+            //TODO figure out to unregister from api
+        }
     }
 
     override fun search(): Flow<List<Device>> {

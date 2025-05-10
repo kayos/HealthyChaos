@@ -17,6 +17,7 @@ class FailingSensorStub() : IHeartRateSensor {
     override val heartRate: StateFlow<HeartRate?> = MutableStateFlow(null)
     override val availableDevices: StateFlow<List<PolarDeviceInfo>> = MutableStateFlow(emptyList())
     override val connectedDevices: StateFlow<PolarDeviceInfo?> = MutableStateFlow(null)
+    override val connectedDevice: Flow<Device?> = MutableStateFlow(null)
 
     val recordings: StateFlow<List<PolarOfflineRecordingEntry>> = MutableStateFlow(emptyList())
 
