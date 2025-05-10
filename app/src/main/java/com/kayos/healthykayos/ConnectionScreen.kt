@@ -15,11 +15,29 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kayos.polar.Device
 
+
+@Composable
+fun ConnectionScreen(onRecordingsClick: () -> Unit,
+                     onLiveClick: () -> Unit,
+                     viewModel: ConnectionViewModel = viewModel(factory = ConnectionViewModel.Factory)){
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ConnectionScreen(
+        onRecordingsClick,
+        onLiveClick,
+        onSearchClick = { viewModel.search() },
+        onConnectClick = { id -> viewModel.connect(id) },
+        uiState)
+}
 
 @Composable
 fun ConnectionScreen(
