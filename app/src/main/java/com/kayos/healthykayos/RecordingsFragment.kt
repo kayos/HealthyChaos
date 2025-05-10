@@ -80,7 +80,7 @@ class RecordingsFragment : Fragment() {
 }
 
 @Composable
-private fun RecordingsScreen(
+fun RecordingsScreen(
     viewModel: RecordingsViewModel = viewModel(factory = RecordingsViewModel.Factory))
 {
     val isRecording by viewModel.recordingState.collectAsStateWithLifecycle()

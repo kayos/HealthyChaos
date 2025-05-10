@@ -51,7 +51,7 @@ class HeartRateStreamFragment : Fragment() {
 }
 
 @Composable
-private fun LiveHeartRateScreen(
+fun LiveHeartRateScreen(
     viewModel: LiveHeartRateViewModel = viewModel(factory = LiveHeartRateViewModel.Factory)
 ) {
 

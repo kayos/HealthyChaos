@@ -34,8 +34,15 @@ fun AppScreen() {
             }
             composable(route = ConnectionScreen.route) {
                 ConnectionScreen(
-                    { },{  }
+                    { navController.navigate(RecordingsScreen.route) },
+                    { navController.navigate(LiveHeartRateScreen.route) }
                 )
+            }
+            composable(route = RecordingsScreen.route) {
+                RecordingsScreen()
+            }
+            composable(route = LiveHeartRateScreen.route) {
+                LiveHeartRateScreen()
             }
         } }
     )
