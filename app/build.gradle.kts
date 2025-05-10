@@ -59,6 +59,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
     testImplementation("app.cash.turbine:turbine:1.2.0")
+    testImplementation("org.robolectric:robolectric:4.14")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.8")

@@ -14,13 +14,17 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import java.util.Calendar
 import java.util.Date
+import org.robolectric.RobolectricTestRunner;
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
 class RecordingsViewModelTest {
+
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
