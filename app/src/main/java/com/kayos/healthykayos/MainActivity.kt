@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import com.kayos.polar.HeartRateProviderFactory
 import com.kayos.polar.IHeartRateSensor
@@ -24,7 +25,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContent {
+            AppScreen()
+        }
         Log.d(TAG, "version: " + PolarBleApiDefaultImpl.versionInfo())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
