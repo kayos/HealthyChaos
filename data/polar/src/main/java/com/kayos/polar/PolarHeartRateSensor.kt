@@ -30,9 +30,6 @@ internal class PolarHeartRateSensor private constructor(
     private val _availableDevices = MutableStateFlow<List<PolarDeviceInfo>>(emptyList())
     override val availableDevices: StateFlow<List<PolarDeviceInfo>> get() = _availableDevices
 
-    private val _connectedDevices = MutableStateFlow<PolarDeviceInfo?>(null)
-    override val connectedDevices: StateFlow<PolarDeviceInfo?> get() = _connectedDevices
-
     private var heartRateDisposable: Disposable? = null
     private val _heartRate = MutableStateFlow<HeartRate?>(null)
     override val heartRate: StateFlow<HeartRate?> get() = _heartRate
@@ -60,7 +57,6 @@ internal class PolarHeartRateSensor private constructor(
             override fun deviceConnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
                 selectedDeviceId = polarDeviceInfo.deviceId
-                _connectedDevices.value = polarDeviceInfo
                 _deviceManager.notifyDeviceConnected(
                     Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
                 trySend(Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
@@ -73,7 +69,6 @@ internal class PolarHeartRateSensor private constructor(
             override fun deviceDisconnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.deviceId}")
                 selectedDeviceId = null
-                _connectedDevices.value = null
                 trySend(null)
             }
 

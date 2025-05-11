@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 interface IHeartRateSensor {
     val heartRate: StateFlow<HeartRate?>
     val availableDevices: StateFlow<List<PolarDeviceInfo>>
-    val connectedDevices: StateFlow<PolarDeviceInfo?>
     val connectedDevice : Flow<Device?>
 
     fun search(): Flow<List<Device>>
