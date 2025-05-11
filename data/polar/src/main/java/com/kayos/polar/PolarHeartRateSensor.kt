@@ -27,7 +27,6 @@ internal class PolarHeartRateSensor private constructor(
     context: Context,
     private val _deviceManager : DeviceManager = DeviceManager.getInstance()) : IHeartRateSensor {
 
-    private var searchDisposable: Disposable? = null
     private val _availableDevices = MutableStateFlow<List<PolarDeviceInfo>>(emptyList())
     override val availableDevices: StateFlow<List<PolarDeviceInfo>> get() = _availableDevices
 
@@ -40,8 +39,6 @@ internal class PolarHeartRateSensor private constructor(
 
     // TODO: set this when specific device is connected, rethink sharing between fragments
     var selectedDeviceId: String? = null
-
-    val hrSampleRateSec = 1
 
     //TODO make private once refactor is done
     val api: PolarBleApi = PolarApiFactory.getPolarApi(context)
