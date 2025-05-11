@@ -23,7 +23,9 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx3.await
 import java.time.Instant
 
-internal class PolarHeartRateSensor private constructor(context: Context) : IHeartRateSensor {
+internal class PolarHeartRateSensor private constructor(
+    context: Context,
+    private val _deviceManager : DeviceManager = DeviceManager.getInstance()) : IHeartRateSensor {
 
     private var searchDisposable: Disposable? = null
     private val _availableDevices = MutableStateFlow<List<PolarDeviceInfo>>(emptyList())
@@ -62,6 +64,8 @@ internal class PolarHeartRateSensor private constructor(context: Context) : IHea
                 Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
                 selectedDeviceId = polarDeviceInfo.deviceId
                 _connectedDevices.value = polarDeviceInfo
+                _deviceManager.notifyDeviceConnected(
+                    Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
                 trySend(Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
             }
 
