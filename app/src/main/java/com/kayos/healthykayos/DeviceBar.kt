@@ -34,6 +34,9 @@ internal fun DeviceBar(device: Device?, onAddDeviceClick: () -> Unit,){
             if(device == null){
                 Text("No Device", modifier = Modifier.testTag("test-no-device-text"))
             }
+            else {
+                Text(device.name, modifier = Modifier.testTag("test-device-text"))
+            }
         },
         actions = {
             IconButton(onClick = onAddDeviceClick) {
