@@ -1,6 +1,5 @@
 package com.kayos.polar
 
-import com.polar.sdk.api.PolarBleApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +24,10 @@ class DeviceManager() {
 
     fun notifyDeviceConnected(device: Device){
         _connectedDevice.value = device
+    }
+
+    fun getConnectedDevice(): Device? {
+        return _connectedDevice.value
     }
 }
 

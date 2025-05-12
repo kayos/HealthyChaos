@@ -34,9 +34,6 @@ internal class PolarHeartRateSensor private constructor(
     private val _heartRate = MutableStateFlow<HeartRate?>(null)
     override val heartRate: StateFlow<HeartRate?> get() = _heartRate
 
-    // TODO: set this when specific device is connected, rethink sharing between fragments
-    var selectedDeviceId: String? = null
-
     //TODO make private once refactor is done
     val api: PolarBleApi = PolarApiFactory.getPolarApi(context)
 
@@ -56,7 +53,6 @@ internal class PolarHeartRateSensor private constructor(
         val callback = object : PolarBleApiCallback() {
             override fun deviceConnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
-                selectedDeviceId = polarDeviceInfo.deviceId
                 _deviceManager.notifyDeviceConnected(
                     Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
                 trySend(Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
@@ -68,7 +64,6 @@ internal class PolarHeartRateSensor private constructor(
 
             override fun deviceDisconnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.deviceId}")
-                selectedDeviceId = null
                 trySend(null)
             }
 
@@ -136,31 +131,37 @@ internal class PolarHeartRateSensor private constructor(
     }
 
     override fun startRecording(): Completable {
-        return api.startOfflineRecording(selectedDeviceId!!, PolarBleApi.PolarDeviceDataType.HR)
+        val deviceId = _deviceManager.getConnectedDevice()!!.id
+        return api.startOfflineRecording(deviceId, PolarBleApi.PolarDeviceDataType.HR)
     }
 
     override fun stopRecording(): Completable {
-        return api.stopOfflineRecording(selectedDeviceId!!, PolarBleApi.PolarDeviceDataType.HR)
+        val deviceId = _deviceManager.getConnectedDevice()!!.id
+        return api.stopOfflineRecording(deviceId, PolarBleApi.PolarDeviceDataType.HR)
     }
 
     override suspend fun deleteRecording(entry: PolarOfflineRecordingEntry) {
-        api.removeOfflineRecord(selectedDeviceId!!, entry).await()
+        val deviceId = _deviceManager.getConnectedDevice()!!.id
+        api.removeOfflineRecord(deviceId, entry).await()
         listRecordings()
     }
 
     override suspend fun downloadRecording(recording: PolarOfflineRecordingEntry): PolarOfflineRecordingData {
-        return api.getOfflineRecord(selectedDeviceId!!, recording).await()
+        val deviceId = _deviceManager.getConnectedDevice()!!.id
+        return api.getOfflineRecord(deviceId, recording).await()
     }
 
     override suspend fun isRecording(): Boolean {
-        return api.getOfflineRecordingStatus(selectedDeviceId!!).map { runningRecordings ->
+        val deviceId = _deviceManager.getConnectedDevice()!!.id
+        return api.getOfflineRecordingStatus(deviceId).map { runningRecordings ->
             runningRecordings.contains(PolarBleApi.PolarDeviceDataType.HR)
         }.await()
     }
 
     override fun startHeartRateStream() {
+        val deviceId = _deviceManager.getConnectedDevice()!!.id
         heartRateDisposable?.dispose()
-        heartRateDisposable = api.startHrStreaming(selectedDeviceId!!)
+        heartRateDisposable = api.startHrStreaming(deviceId)
             .flatMap { data -> Flowable.fromIterable(data.samples) }
             .map { sample -> HeartRate(Instant.now(), sample.hr) }
             .subscribeBy(
@@ -182,8 +183,9 @@ internal class PolarHeartRateSensor private constructor(
     }
 
     override fun listRecordings(): Flow<List<PolarOfflineRecordingEntry>> {
+        val deviceId = _deviceManager.getConnectedDevice()!!.id
         val recordings = mutableListOf<PolarOfflineRecordingEntry>()
-        return api.listOfflineRecordings(selectedDeviceId!!).map { entry ->
+        return api.listOfflineRecordings(deviceId).map { entry ->
             recordings.add(entry)
             recordings.toList()
         }.asFlow()
