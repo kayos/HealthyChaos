@@ -14,11 +14,9 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx3.await
 import java.time.Instant
@@ -49,13 +47,16 @@ internal class PolarHeartRateSensor private constructor(
             }
     }
 
-    override val connectedDevice : Flow<Device?> = callbackFlow {
+    private val _connectedDevice = MutableStateFlow<Device?>(null)
+    override val connectedDevice : Flow<Device?> = _connectedDevice
+
+    init{
         val callback = object : PolarBleApiCallback() {
             override fun deviceConnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
                 _deviceManager.notifyDeviceConnected(
                     Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
-                trySend(Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
+                _connectedDevice.value =  Device(polarDeviceInfo.deviceId, polarDeviceInfo.name)
             }
 
             override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {
@@ -64,7 +65,6 @@ internal class PolarHeartRateSensor private constructor(
 
             override fun deviceDisconnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.deviceId}")
-                trySend(null)
             }
 
             override fun batteryLevelReceived(identifier: String, level: Int) {
@@ -98,10 +98,6 @@ internal class PolarHeartRateSensor private constructor(
 
         }
         api.setApiCallback(callback)
-
-        awaitClose {
-            //TODO figure out to unregister from api
-        }
     }
 
     override fun search(): Flow<List<Device>> {
