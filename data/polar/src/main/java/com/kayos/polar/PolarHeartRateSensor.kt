@@ -47,16 +47,12 @@ internal class PolarHeartRateSensor private constructor(
             }
     }
 
-    private val _connectedDevice = MutableStateFlow<Device?>(null)
-    override val connectedDevice : Flow<Device?> = _connectedDevice
-
     init{
         val callback = object : PolarBleApiCallback() {
             override fun deviceConnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
                 _deviceManager.notifyDeviceConnected(
                     Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
-                _connectedDevice.value =  Device(polarDeviceInfo.deviceId, polarDeviceInfo.name)
             }
 
             override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {

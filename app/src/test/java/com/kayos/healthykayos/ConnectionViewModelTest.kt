@@ -40,7 +40,6 @@ class ConnectionViewModelTest {
         val expected = listOf(Device("1", "name"))
         val sensorStub = mock<IHeartRateSensor> {
             on { search() } doReturn flowOf(expected)
-            on { connectedDevice } doReturn flowOf(null)
         }
 
         val viewModel = ConnectionViewModel(

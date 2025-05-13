@@ -17,11 +17,10 @@ import kotlinx.coroutines.flow.flowOf
 class SensorStub(override val heartRate: StateFlow<HeartRate?>) : IHeartRateSensor {
 
     override val availableDevices: StateFlow<List<PolarDeviceInfo>> = MutableStateFlow(emptyList())
-    override val connectedDevice: Flow<Device?> = MutableStateFlow(null)
 
     var isRecording: Boolean = false
 
-    override fun search(): Flow<List<com.kayos.polar.Device>> {
+    override fun search(): Flow<List<Device>> {
         TODO("Not yet implemented")
     }
 
