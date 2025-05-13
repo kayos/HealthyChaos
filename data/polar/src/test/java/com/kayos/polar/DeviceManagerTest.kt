@@ -8,15 +8,25 @@ import org.junit.Assert.*
 class DeviceManagerTest {
 
     @Test
-    fun notifyDeviceConnected_() = runTest {
-        val device = Device("id", "Polar")
+    fun connectedDevice_onInit_emitsNull() = runTest {
         val manager = DeviceManager()
 
         manager.connectedDevice.test{
-            awaitItem() //first null device
-            manager.notifyDeviceConnected(device)
+            assertNull(awaitItem())
+        }
 
+    }
+
+    @Test
+    fun connectedDevice_emitsLatestConnectedDevice() = runTest {
+        val device = Device("id", "Polar")
+        val manager = DeviceManager()
+
+        manager.notifyDeviceConnected(device)
+
+        manager.connectedDevice.test{
             assertEquals(device, awaitItem())
         }
+
     }
 }
