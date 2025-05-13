@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kayos.polar.Device
+import com.kayos.polar.DeviceManager
 import com.kayos.polar.HeartRateProviderFactory
 import com.kayos.polar.IHeartRateSensor
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +19,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 
 
-class ConnectionViewModel(private val _sensor: IHeartRateSensor) : ViewModel() {
+class ConnectionViewModel(
+    private val _sensor: IHeartRateSensor,
+     deviceManager : DeviceManager = DeviceManager.getInstance()) : ViewModel() {
+
     private val _shouldSearch = MutableStateFlow(false)
     private val _availableDevices: Flow<List<Device>> = _shouldSearch.flatMapLatest {
         shouldSearch ->
@@ -26,7 +30,7 @@ class ConnectionViewModel(private val _sensor: IHeartRateSensor) : ViewModel() {
             else flowOf(emptyList<Device>())
     }
 
-    private val _connectedDevice : Flow<Device?> = _sensor.connectedDevice.stateIn(
+    private val _connectedDevice : StateFlow<Device?> = deviceManager.connectedDevice.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
         initialValue = null,
