@@ -39,7 +39,7 @@ internal fun DeviceBar(device: Device?, onAddDeviceClick: () -> Unit,){
             }
         },
         actions = {
-            IconButton(onClick = onAddDeviceClick) {
+            IconButton(onClick = onAddDeviceClick, modifier = Modifier.testTag("test-connect-btn")) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Connect Device")
             }
         },

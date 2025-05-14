@@ -15,22 +15,22 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = HomeScreen.route,
+        startDestination = Home,
         modifier = Modifier.Companion.padding(innerPadding)
     ) {
-        composable(route = HomeScreen.route) {
+        composable<Home>{
             HomeScreen()
         }
-        composable(route = ConnectionScreen.route) {
+        composable<Connection> {
             ConnectionScreen(
-                { navController.navigate(RecordingsScreen.route) },
-                { navController.navigate(LiveHeartRateScreen.route) }
+                { navController.navigate(route = Recordings) },
+                { navController.navigate(route = Live) }
             )
         }
-        composable(route = RecordingsScreen.route) {
+        composable<Recordings> {
             RecordingsScreen()
         }
-        composable(route = LiveHeartRateScreen.route) {
+        composable<Live> {
             LiveHeartRateScreen()
         }
     }

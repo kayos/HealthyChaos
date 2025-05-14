@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("org.jetbrains.kotlin.plugin.compose") version "2.0.21"
+    kotlin("plugin.serialization") version "2.0.21"
 }
 
 android {
@@ -67,6 +68,7 @@ dependencies {
     androidTestImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
     androidTestImplementation("org.mockito:mockito-core:5.17.0")
     androidTestImplementation("org.mockito:mockito-android:5.17.0")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.9.0")
     debugImplementation("androidx.compose.ui:ui-tooling:1.7.8")
 
     // COMPOSE ----------------------------------
