@@ -22,10 +22,7 @@ fun AppNavHost(
             HomeScreen()
         }
         composable<Connection> {
-            ConnectionScreen(
-                { navController.navigate(route = Recordings) },
-                { navController.navigate(route = Live) }
-            )
+            ConnectionScreen()
         }
         composable<Recordings> {
             RecordingsScreen()

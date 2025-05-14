@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -25,15 +24,11 @@ import com.kayos.polar.Device
 
 
 @Composable
-fun ConnectionScreen(onRecordingsClick: () -> Unit,
-                     onLiveClick: () -> Unit,
-                     viewModel: ConnectionViewModel = viewModel(factory = ConnectionViewModel.Factory)){
+fun ConnectionScreen(viewModel: ConnectionViewModel = viewModel(factory = ConnectionViewModel.Factory)){
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ConnectionScreen(
-        onRecordingsClick,
-        onLiveClick,
         onSearchClick = { viewModel.search() },
         onConnectClick = { id -> viewModel.connect(id) },
         uiState)
@@ -41,8 +36,6 @@ fun ConnectionScreen(onRecordingsClick: () -> Unit,
 
 @Composable
 fun ConnectionScreen(
-    onRecordingsClick: () -> Unit,
-    onLiveClick: () -> Unit,
     onSearchClick: () -> Unit,
     onConnectClick: (deviceId: String) -> Unit,
     uiState: ConnectionUiState
@@ -60,36 +53,18 @@ fun ConnectionScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         if (uiState.connectedDevice != null)
-            Device(uiState.connectedDevice, onRecordingsClick, onLiveClick)
+            Device(uiState.connectedDevice)
     }
 }
 
 @Composable
-fun Device(device: Device, onRecordingsClick: () -> Unit, onLiveClick: () -> Unit) {
+fun Device(device: Device) {
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)
         .background(Color.LightGray)) {
 
         Text("Sensor: ${device.id}", style = MaterialTheme.typography.titleLarge)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Column {
-            Button(
-                onClick = onRecordingsClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Recordings")
-            }
-            Button(
-                onClick = onLiveClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Live HR")
-            }
-        }
-
     }
 }
 
