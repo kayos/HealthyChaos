@@ -21,7 +21,7 @@ fun AppNavigationBar(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    NavigationBar{
+    NavigationBar(){
         topLevelRoutes.forEachIndexed { index, route ->
             NavigationBarItem(
                 icon = { Icon(route.icon, contentDescription = route.name) },

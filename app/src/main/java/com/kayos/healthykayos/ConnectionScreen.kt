@@ -1,6 +1,5 @@
 package com.kayos.healthykayos
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,14 +46,14 @@ fun ConnectionScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Available Devices", color = MaterialTheme.colorScheme.primary)
+        Text("Available Devices")
         Column {
             uiState.availableDevices.forEach { device ->
                 DeviceItem(device, onClick = { onConnectClick(device.id)})
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Connected Devices", color = MaterialTheme.colorScheme.primary)
+        Text("Connected Devices")
         if (uiState.connectedDevice != null)
             Device(uiState.connectedDevice)
     }
@@ -65,11 +63,10 @@ fun ConnectionScreen(
 private fun Device(device: Device) {
     Box(modifier = Modifier.fillMaxWidth()
         .padding(16.dp)
-        .background(MaterialTheme.colorScheme.background)
         .testTag("test-${device.name.lowercase()}-connected-item")
     ) {
 
-        Text("${device.name}",
+        Text(device.name,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(8.dp))
     }
@@ -83,10 +80,8 @@ private fun DeviceItem(device: Device, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .testTag("test-${device.name.lowercase()}-available-item"),
         headlineContent = {
-            Text(text = device.name,
-                style = MaterialTheme.typography.bodyLarge)
-        },
-        colors = ListItemDefaults.colors(containerColor =  MaterialTheme.colorScheme.background)
+            Text(text = device.name)
+        }
     )
 }
 
