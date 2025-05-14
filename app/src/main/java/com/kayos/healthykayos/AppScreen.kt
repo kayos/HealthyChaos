@@ -20,7 +20,8 @@ fun AppScreen(navController: NavHostController = rememberNavController()){
             )},
         content = { innerPadding ->
             AppNavHost(navController, innerPadding)
-        }
+        },
+        bottomBar = { AppNavigationBar(navController) }
     )
 }
 
