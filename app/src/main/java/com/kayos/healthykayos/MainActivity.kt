@@ -2,12 +2,16 @@ package com.kayos.healthykayos
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import com.kayos.healthykayos.ui.theme.KayosTheme
 import com.kayos.polar.HeartRateProviderFactory
 import com.kayos.polar.IHeartRateSensor
 import com.polar.sdk.api.PolarBleApiDefaultImpl
@@ -26,7 +30,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppScreen()
+            KayosTheme(darkTheme = true) {
+                AppScreen()
+            }
+
         }
         Log.d(TAG, "version: " + PolarBleApiDefaultImpl.versionInfo())
 
@@ -69,5 +76,20 @@ class MainActivity : AppCompatActivity() {
     private fun showToast(message: String) {
         val toast = Toast.makeText(applicationContext, message, Toast.LENGTH_LONG)
         toast.show()
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
+@Composable
+fun AppPreview() {
+    KayosTheme {
+        AppScreen()
     }
 }
