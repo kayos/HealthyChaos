@@ -11,12 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -73,8 +72,8 @@ fun ConnectionScreen(
                     )
                 }
             }
-            Column {
-                uiState.availableDevices.forEach { device ->
+            LazyColumn {
+                items(uiState.availableDevices){ device ->
                     DeviceItem(device, onClick = { onConnectClick(device.id) })
                 }
             }
@@ -105,15 +104,10 @@ private fun Device(device: Device) {
 
 @Composable
 private fun DeviceItem(device: Device, onClick: () -> Unit) {
-    ListItem(
-        modifier = Modifier
-            .padding(16.dp)
-            .clickable(onClick = onClick)
-            .testTag("test-${device.name.lowercase()}-available-item"),
-        headlineContent = {
-            Text(text = device.name)
-        }
-    )
+   Text(text = device.name, color = MaterialTheme.colorScheme.onBackground,
+       modifier = Modifier.padding(8.dp)
+       .clickable(onClick = onClick)
+       .testTag("test-${device.name.lowercase()}-available-item"))
 }
 
 
