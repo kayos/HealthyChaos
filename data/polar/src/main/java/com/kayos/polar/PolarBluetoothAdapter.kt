@@ -22,8 +22,8 @@ class PolarBluetoothAdapter(
         val callback = object : PolarBleApiCallback() {
             override fun deviceConnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
-                _deviceManager.notifyDeviceConnected(
-                    Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
+                val device = PolarDevice(polarDeviceInfo.deviceId, polarDeviceInfo.name,api)
+                _deviceManager.notifyDeviceConnected(device)
             }
 
             override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {
