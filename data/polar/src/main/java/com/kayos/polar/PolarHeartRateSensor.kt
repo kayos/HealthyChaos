@@ -2,11 +2,7 @@ package com.kayos.polar
 
 import android.content.Context
 import android.util.Log
-import com.polar.androidcommunications.api.ble.model.DisInfo
 import com.polar.sdk.api.PolarBleApi
-import com.polar.sdk.api.PolarBleApiCallback
-import com.polar.sdk.api.model.PolarDeviceInfo
-import com.polar.sdk.api.model.PolarHealthThermometerData
 import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
@@ -25,9 +21,6 @@ internal class PolarHeartRateSensor private constructor(
     context: Context,
     private val _deviceManager : DeviceManager = DeviceManager.getInstance()) : IHeartRateSensor {
 
-    private val _availableDevices = MutableStateFlow<List<PolarDeviceInfo>>(emptyList())
-    override val availableDevices: StateFlow<List<PolarDeviceInfo>> get() = _availableDevices
-
     private var heartRateDisposable: Disposable? = null
     private val _heartRate = MutableStateFlow<HeartRate?>(null)
     override val heartRate: StateFlow<HeartRate?> get() = _heartRate
@@ -45,73 +38,6 @@ internal class PolarHeartRateSensor private constructor(
             instance ?: synchronized(this) {
                 instance ?: PolarHeartRateSensor(context).also { instance = it }
             }
-    }
-
-    init{
-        val callback = object : PolarBleApiCallback() {
-            override fun deviceConnected(polarDeviceInfo: PolarDeviceInfo) {
-                Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
-                _deviceManager.notifyDeviceConnected(
-                    Device(polarDeviceInfo.deviceId, polarDeviceInfo.name))
-            }
-
-            override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {
-                Log.d(TAG, "CONNECTING: ${polarDeviceInfo.deviceId}")
-            }
-
-            override fun deviceDisconnected(polarDeviceInfo: PolarDeviceInfo) {
-                Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.deviceId}")
-            }
-
-            override fun batteryLevelReceived(identifier: String, level: Int) {
-                Log.d(TAG, "BATTERY LEVEL: $level")
-            }
-
-            override fun blePowerStateChanged(powered: Boolean) {
-                //don't care
-            }
-
-            override fun disInformationReceived(
-                identifier: String,
-                disInfo: DisInfo
-            ) {
-                // don't care
-            }
-
-            override fun hrNotificationReceived(
-                identifier: String,
-                data: PolarHrData.PolarHrSample
-            ) {
-                // deprecated
-            }
-
-            override fun htsNotificationReceived(
-                identifier: String,
-                data: PolarHealthThermometerData
-            ) {
-                // don't care
-            }
-
-        }
-        api.setApiCallback(callback)
-    }
-
-    override fun search(): Flow<List<Device>> {
-        api.setPolarFilter(true)
-
-        val devices =  mutableListOf<Device>()
-        return api.searchForDevice().map { entry ->
-            devices.add(Device(entry.deviceId, entry.name))
-            devices.toList()
-        }.asFlow()
-    }
-
-    override fun connect(deviceId: String) {
-        api.connectToDevice(deviceId)
-    }
-
-    override fun disconnect(deviceId: String) {
-        api.disconnectFromDevice(deviceId)
     }
 
     override fun dispose(){

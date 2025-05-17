@@ -1,9 +1,7 @@
 package com.kayos.healthykayos.doubles
 
-import com.kayos.polar.Device
 import com.kayos.polar.HeartRate
 import com.kayos.polar.IHeartRateSensor
-import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
@@ -15,23 +13,10 @@ import kotlinx.coroutines.flow.StateFlow
 
 class FailingSensorStub() : IHeartRateSensor {
     override val heartRate: StateFlow<HeartRate?> = MutableStateFlow(null)
-    override val availableDevices: StateFlow<List<PolarDeviceInfo>> = MutableStateFlow(emptyList())
 
     val recordings: StateFlow<List<PolarOfflineRecordingEntry>> = MutableStateFlow(emptyList())
 
     var isRecording: Boolean = false
-
-    override fun search(): Flow<List<Device>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun connect(deviceId: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun disconnect(id: String) {
-        TODO("Not yet implemented")
-    }
 
     override fun dispose(){
         TODO("Not yet implemented")

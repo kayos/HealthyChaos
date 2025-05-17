@@ -1,6 +1,5 @@
 package com.kayos.polar
 
-import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
@@ -14,11 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
  * */
 interface IHeartRateSensor {
     val heartRate: StateFlow<HeartRate?>
-    val availableDevices: StateFlow<List<PolarDeviceInfo>>
 
-    fun search(): Flow<List<Device>>
-    fun connect(deviceId: String)
-    fun disconnect(deviceId: String)
     fun dispose()
 
     fun startHR(deviceId: String): Flowable<PolarHrData>

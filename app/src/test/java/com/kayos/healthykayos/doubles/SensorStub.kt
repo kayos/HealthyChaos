@@ -1,36 +1,19 @@
 package com.kayos.healthykayos.doubles
 
-import com.kayos.polar.Device
 import com.kayos.polar.HeartRate
 import com.kayos.polar.IHeartRateSensor
-import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 
 class SensorStub(override val heartRate: StateFlow<HeartRate?>) : IHeartRateSensor {
 
-    override val availableDevices: StateFlow<List<PolarDeviceInfo>> = MutableStateFlow(emptyList())
-
     var isRecording: Boolean = false
-
-    override fun search(): Flow<List<Device>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun connect(deviceId: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun disconnect(id: String) {
-        TODO("Not yet implemented")
-    }
 
     override fun dispose(){
         TODO("Not yet implemented")
