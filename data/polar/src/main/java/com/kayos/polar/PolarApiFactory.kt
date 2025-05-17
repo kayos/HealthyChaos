@@ -4,7 +4,7 @@ import android.content.Context
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiDefaultImpl
 
-internal object PolarApiFactory {
+object PolarApiFactory {
     @JvmStatic
     fun getPolarApi(context: Context): PolarBleApi {
         return PolarBleApiDefaultImpl.defaultImplementation(

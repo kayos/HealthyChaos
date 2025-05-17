@@ -7,8 +7,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kayos.polar.Device
 import com.kayos.polar.DeviceManager
-import com.kayos.polar.HeartRateProviderFactory
-import com.kayos.polar.IHeartRateSensor
+import com.kayos.polar.PolarApiFactory
+import com.kayos.polar.PolarBluetoothAdapter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,13 +20,13 @@ import kotlinx.coroutines.flow.stateIn
 
 
 class ConnectionViewModel(
-    private val _sensor: IHeartRateSensor,
+    private val _bluetoothAdapter: PolarBluetoothAdapter,
      deviceManager : DeviceManager = DeviceManager.getInstance()) : ViewModel() {
 
     private val _shouldSearch = MutableStateFlow(false)
     private val _availableDevices: Flow<List<Device>> = _shouldSearch.flatMapLatest {
         shouldSearch ->
-            if (shouldSearch) _sensor.search()
+            if (shouldSearch) _bluetoothAdapter.search()
             else flowOf(emptyList<Device>())
     }
 
@@ -50,7 +50,7 @@ class ConnectionViewModel(
     }
 
     fun connect(deviceId: String) {
-        _sensor.connect(deviceId)
+        _bluetoothAdapter.connect(deviceId)
     }
 
     companion object {
@@ -59,7 +59,7 @@ class ConnectionViewModel(
             initializer {
                 val application = checkNotNull(this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
                 ConnectionViewModel(
-                    _sensor = HeartRateProviderFactory.getPolarHeartRateSensor(application.applicationContext)
+                    _bluetoothAdapter = PolarBluetoothAdapter(PolarApiFactory.getPolarApi(application.applicationContext)),
                 )
             }
         }

@@ -1,11 +1,9 @@
 package com.kayos.healthykayos
 
 import app.cash.turbine.test
-import com.kayos.healthykayos.doubles.SensorStub
 import com.kayos.healthykayos.testutils.MainDispatcherRule
 import com.kayos.polar.Device
-import com.kayos.polar.IHeartRateSensor
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.kayos.polar.PolarBluetoothAdapter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -24,7 +22,7 @@ class ConnectionViewModelTest {
     @Test
     fun onInitialisation_noDevicesAvailable() = runTest {
         val viewModel = ConnectionViewModel(
-            _sensor = SensorStub(MutableStateFlow(null))
+            _bluetoothAdapter = mock<PolarBluetoothAdapter>{}
         )
 
         viewModel.uiState.test {
@@ -38,12 +36,12 @@ class ConnectionViewModelTest {
     @Test
     fun search_uiStateContainsFoundDevices() = runTest {
         val expected = listOf(Device("1", "name"))
-        val sensorStub = mock<IHeartRateSensor> {
+        val bluetoothStub = mock<PolarBluetoothAdapter> {
             on { search() } doReturn flowOf(expected)
         }
 
         val viewModel = ConnectionViewModel(
-            _sensor = sensorStub
+            _bluetoothAdapter = bluetoothStub
         )
 
         viewModel.uiState.test {
