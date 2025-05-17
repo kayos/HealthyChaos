@@ -1,3 +1,8 @@
 package com.kayos.polar
 
-data class Device(val id: String, val name: String)
+open class Device(val id: String, val name: String) {
+    fun getRecordingsFunctionality(): IRecordingsAPI? {
+        return this as? IRecordingsAPI
+    }
+}
+
