@@ -40,12 +40,11 @@ import java.io.Writer
 fun RecordingsScreen(
     viewModel: RecordingsViewModel = viewModel(factory = RecordingsViewModel.Factory))
 {
-    val isRecording by viewModel.recordingState.collectAsStateWithLifecycle()
-    val recordings by viewModel.recordings.collectAsStateWithLifecycle(initialValue = emptyList())
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     RecordingsScreen(
-        recordings,
-        isRecording,
+        uiState.recordings,
+        uiState.recordingStatus,
         onStartRecordingClick = { viewModel.startRecording() },
         onStopRecordingClick = { viewModel.stopRecording() },
         onDownloadClick = { recording: PolarOfflineRecordingEntry, writer: Writer ->

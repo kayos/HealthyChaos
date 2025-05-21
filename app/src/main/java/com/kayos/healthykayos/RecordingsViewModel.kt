@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -24,6 +25,10 @@ import kotlinx.coroutines.rx3.await
 import java.io.IOException
 import java.io.Writer
 import java.util.Calendar
+
+data class RecordingsUiState(
+    val recordingStatus: RecordingState,
+    val recordings: List<PolarOfflineRecordingEntry>)
 
 class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
     private val _recordingState : MutableStateFlow<RecordingState> = MutableStateFlow(RecordingState.NotRecording())
@@ -40,6 +45,16 @@ class RecordingsViewModel(val sensor: IHeartRateSensor) : ViewModel(){
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = emptyList<PolarOfflineRecordingEntry>(),
+        )
+
+    val uiState: StateFlow<RecordingsUiState> = combine(
+        recordings,
+        recordingState)
+        { recordings, status -> RecordingsUiState(status, recordings) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = RecordingsUiState(RecordingState.NotRecording(), emptyList()),
         )
 
     init {

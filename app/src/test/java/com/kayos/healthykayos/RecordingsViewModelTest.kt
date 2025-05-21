@@ -83,8 +83,8 @@ class RecordingsViewModelTest {
         }
 
         val viewModel = RecordingsViewModel(sensorStub)
-        viewModel.recordings.test {
-            assertEquals(listOf(olderEntry, newerEntry), awaitItem())
+        viewModel.uiState.test {
+            assertEquals(listOf(olderEntry, newerEntry), awaitItem().recordings)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -101,12 +101,12 @@ class RecordingsViewModelTest {
         }
 
         val viewModel = RecordingsViewModel(sensorStub)
-        viewModel.recordings.test {
-            assertEquals(emptyList<PolarOfflineRecordingEntry>(), awaitItem())
+        viewModel.uiState.test {
+            assertEquals(emptyList<PolarOfflineRecordingEntry>(), awaitItem().recordings)
 
             viewModel.refresh()
 
-            assertEquals(expected, awaitItem())
+            assertEquals(expected, awaitItem().recordings)
 
             cancelAndIgnoreRemainingEvents()
         }
