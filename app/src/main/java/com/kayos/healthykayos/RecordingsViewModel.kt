@@ -37,7 +37,7 @@ class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceMan
     private val _recordingState : MutableStateFlow<RecordingState> = MutableStateFlow(RecordingState.NotRecording())
     val recordingState: StateFlow<RecordingState> get() = _recordingState
 
-    private val _refresh : MutableStateFlow<Int> = MutableStateFlow(0)
+    private val _refreshRecordings : MutableStateFlow<Int> = MutableStateFlow(0)
 
     private val _connectedRecorder : StateFlow<IRecordingsAPI?> =
         deviceManager.connectedDevice.map { device -> device?.getRecordingsFunctionality()}
@@ -49,7 +49,7 @@ class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceMan
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val recordings: Flow<List<PolarOfflineRecordingEntry>> = combine(
-        _refresh,
+        _refreshRecordings,
         _connectedRecorder.filterNotNull()){ _, device -> device }
         .flatMapLatest { device -> device.listRecordings() }
         .map { recordings -> recordings.sortedBy { entry -> entry.date } }
@@ -152,7 +152,7 @@ class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceMan
     }
 
     fun refresh() {
-        _refresh.tryEmit(_refresh.value+1)
+        _refreshRecordings.tryEmit(_refreshRecordings.value+1)
     }
 
     companion object {
