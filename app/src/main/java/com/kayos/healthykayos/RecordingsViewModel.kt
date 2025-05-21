@@ -146,12 +146,12 @@ class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceMan
                 Log.e(TAG, "Problem deleting recording ${e.message}")
             }
             finally {
-                refresh()
+                refreshRecordings()
             }
         }
     }
 
-    fun refresh() {
+    fun refreshRecordings() {
         _refreshRecordings.tryEmit(_refreshRecordings.value+1)
     }
 

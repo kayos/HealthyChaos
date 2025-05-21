@@ -103,7 +103,7 @@ class RecordingsViewModelTest {
     }
 
     @Test
-    fun refresh_updatesRecordings() = runTest {
+    fun refreshRecordings_updatesRecordings() = runTest {
         val expected : List<PolarOfflineRecordingEntry> = listOf(
             PolarOfflineRecordingEntry("a/b", 1234, Date(), PolarBleApi.PolarDeviceDataType.ACC)
         )
@@ -127,7 +127,7 @@ class RecordingsViewModelTest {
         viewModel.uiState.test {
             assertEquals(emptyList<PolarOfflineRecordingEntry>(), awaitItem().recordings)
 
-            viewModel.refresh()
+            viewModel.refreshRecordings()
 
             assertEquals(expected, awaitItem().recordings)
 

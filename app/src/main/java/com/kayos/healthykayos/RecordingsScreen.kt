@@ -53,7 +53,7 @@ fun RecordingsScreen(
         onDeleteClick = { recording: PolarOfflineRecordingEntry ->
             viewModel.deleteRecording(recording)
         },
-        onRefreshClick = { viewModel.refresh() }
+        onRefreshClick = { viewModel.refreshRecordings() }
     )
 }
 
