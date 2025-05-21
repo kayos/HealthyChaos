@@ -4,7 +4,10 @@ import app.cash.turbine.test
 import com.kayos.healthykayos.doubles.FailingSensorStub
 import com.kayos.healthykayos.doubles.SensorStub
 import com.kayos.healthykayos.testutils.MainDispatcherRule
+import com.kayos.polar.Device
+import com.kayos.polar.DeviceManager
 import com.kayos.polar.IHeartRateSensor
+import com.kayos.polar.IRecordingsAPI
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,9 +20,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.robolectric.RobolectricTestRunner
 import java.util.Calendar
 import java.util.Date
-import org.robolectric.RobolectricTestRunner;
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -81,8 +84,17 @@ class RecordingsViewModelTest {
             on { listRecordings() } doReturn flowOf(listOf(newerEntry, olderEntry))
             onBlocking { isRecording() } doReturn false
         }
+        val recordingsAPI = mock<IRecordingsAPI> {
+            on { listRecordings() } doReturn flowOf(listOf(newerEntry, olderEntry))
+            onBlocking { isRecording() } doReturn false
+        }
+        val device = mock<Device>{
+            on { getRecordingsFunctionality() } doReturn recordingsAPI
+        }
+        val deviceManager = DeviceManager()
+        deviceManager.notifyDeviceConnected(device)
 
-        val viewModel = RecordingsViewModel(sensorStub)
+        val viewModel = RecordingsViewModel(sensorStub, deviceManager)
         viewModel.uiState.test {
             assertEquals(listOf(olderEntry, newerEntry), awaitItem().recordings)
 
@@ -99,8 +111,19 @@ class RecordingsViewModelTest {
             on { listRecordings() } doReturn flowOf(emptyList()) doReturn flowOf(expected)
             onBlocking { isRecording() } doReturn false
         }
+        val recordingsAPI = mock<IRecordingsAPI> {
+            on { listRecordings() } doReturn flowOf(emptyList()) doReturn flowOf(
+                expected
+            )
+            onBlocking { isRecording() } doReturn false
+        }
+        val device = mock<Device>{
+            on { getRecordingsFunctionality() } doReturn recordingsAPI
+        }
+        val deviceManager = DeviceManager()
+        deviceManager.notifyDeviceConnected(device)
 
-        val viewModel = RecordingsViewModel(sensorStub)
+        val viewModel = RecordingsViewModel(sensorStub, deviceManager)
         viewModel.uiState.test {
             assertEquals(emptyList<PolarOfflineRecordingEntry>(), awaitItem().recordings)
 
