@@ -13,4 +13,12 @@ class PolarDeviceTest {
 
         assertNotNull(device.getRecordingsFunctionality())
     }
+
+    @Test
+    fun hasStreamFunctionality() {
+        val api = mock<PolarBleApi>{}
+        val device = PolarDevice("123", "name", api)
+
+        assertNotNull(device.getStreamFunctionality())
+    }
 }

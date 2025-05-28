@@ -1,12 +1,11 @@
 package com.kayos.polar
 
-import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import java.time.Instant
 
@@ -44,9 +43,6 @@ class DeviceTest {
 class StreamingDevice : Device("123", "recording"), IStreamAPI {
     override fun startStream(): Flow<HeartRate> {
         return flowOf(HeartRate(Instant.now(), 12))
-    }
-
-    override fun stopStream() {
     }
 }
 

@@ -3,11 +3,17 @@ package com.kayos.polar
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
+import io.reactivex.rxjava3.core.Flowable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx3.await
+import java.time.Instant
 
-class PolarDevice(id: String, name: String, val api: PolarBleApi): Device(id, name), IRecordingsAPI{
+class PolarDevice(id: String, name: String, val api: PolarBleApi):
+    Device(id, name),
+    IRecordingsAPI,
+        IStreamAPI
+{
 
     override fun listRecordings(): Flow<List<PolarOfflineRecordingEntry>> {
         val recordings = mutableListOf<PolarOfflineRecordingEntry>()
@@ -40,4 +46,10 @@ class PolarDevice(id: String, name: String, val api: PolarBleApi): Device(id, na
         }.await()
     }
 
+    override fun startStream(): Flow<HeartRate> {
+        return api.startHrStreaming(id)
+            .flatMap { data -> Flowable.fromIterable(data.samples) }
+            .map { sample -> HeartRate(Instant.now(), sample.hr) }
+            .asFlow()
+    }
 }
