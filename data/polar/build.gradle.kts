@@ -34,11 +34,7 @@ android {
 
 dependencies {
     implementation(project(":data:device"))
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     implementation("io.reactivex.rxjava3:rxjava:3.1.6")
-    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
     implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.7.3")
     implementation("com.github.polarofficial:polar-ble-sdk:5.17.0")
@@ -46,6 +42,4 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("app.cash.turbine:turbine:1.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }
