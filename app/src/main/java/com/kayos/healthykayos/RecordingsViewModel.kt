@@ -35,12 +35,10 @@ data class RecordingsUiState(
 
 class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceManager = DeviceManager.getInstance()) : ViewModel(){
     private val _recordingState : MutableStateFlow<RecordingState> = MutableStateFlow(RecordingState.NotRecording())
-    val recordingState: StateFlow<RecordingState> get() = _recordingState
-
     private val _refreshRecordings : MutableStateFlow<Int> = MutableStateFlow(0)
-
     private val _connectedRecorder : StateFlow<IRecordingsAPI?> =
-        deviceManager.connectedDevice.map { device -> device?.getRecordingsFunctionality()}
+        deviceManager.connectedDevice.map {
+            device -> device?.getRecordingsFunctionality()}
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(),
@@ -48,7 +46,7 @@ class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceMan
             )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val recordings: Flow<List<PolarOfflineRecordingEntry>> = combine(
+    private val _recordings: Flow<List<PolarOfflineRecordingEntry>> = combine(
         _refreshRecordings,
         _connectedRecorder.filterNotNull()){ _, device -> device }
         .flatMapLatest { device -> device.listRecordings() }
@@ -60,8 +58,8 @@ class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceMan
         )
 
     val uiState: StateFlow<RecordingsUiState> = combine(
-        recordings,
-        recordingState)
+        _recordings,
+        _recordingState)
         { recordings, status -> RecordingsUiState(status, recordings) }
         .stateIn(
             scope = viewModelScope,
@@ -71,22 +69,19 @@ class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceMan
 
     init {
         viewModelScope.launch {
-            _recordingState.value = when (sensor.isRecording()){
-                true -> RecordingState.Recording()
-                false -> RecordingState.NotRecording()
-            }
+            determineRecordingState()
         }
     }
 
     fun startRecording() {
         viewModelScope.launch(Dispatchers.Main) {
             try {
-                sensor.startRecording().await()
+                _connectedRecorder.value?.startRecording()
             } catch (e: Exception) {
                 Log.e(TAG, "Problem starting recording ${e.message}")
             }
             finally {
-                _recordingState.value = RecordingState.determineState(sensor.isRecording())
+                determineRecordingState()
             }
         }
     }
@@ -94,19 +89,19 @@ class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceMan
     fun stopRecording() {
         viewModelScope.launch(Dispatchers.Main) {
             try {
-                sensor.stopRecording().await()
+                _connectedRecorder.value?.stopRecording()
             } catch (e: Exception) {
                 Log.e(TAG, "Problem stopping recording ${e.message}")
             }
             finally {
-                _recordingState.value = RecordingState.determineState(sensor.isRecording())
+                determineRecordingState()
             }
         }
     }
 
     fun download(recording: PolarOfflineRecordingEntry, writer: Writer) {
         viewModelScope.launch(Dispatchers.Main) {
-            val data = sensor.downloadRecording(recording)
+            val data = _connectedRecorder.value?.downloadRecording(recording)
             when (data) {
                 is PolarOfflineRecordingData.HrOfflineRecording -> {
                     saveDataToCSV(data, writer)
@@ -141,7 +136,7 @@ class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceMan
     fun deleteRecording(recording: PolarOfflineRecordingEntry) {
         viewModelScope.launch(Dispatchers.Main) {
             try {
-                sensor.deleteRecording(recording)
+                _connectedRecorder.value?.deleteRecording(recording)
             } catch (e: Exception) {
                 Log.e(TAG, "Problem deleting recording ${e.message}")
             }
@@ -153,6 +148,13 @@ class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceMan
 
     fun refreshRecordings() {
         _refreshRecordings.tryEmit(_refreshRecordings.value+1)
+    }
+
+    private suspend fun determineRecordingState() {
+        var isRecording = _connectedRecorder.value?.isRecording()
+        if (isRecording != null) {
+            _recordingState.value = RecordingState.determineState(isRecording)
+        }
     }
 
     companion object {

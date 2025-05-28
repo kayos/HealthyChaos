@@ -1,8 +1,10 @@
 package com.kayos.healthykayos
 
 import app.cash.turbine.test
+import com.kayos.healthykayos.doubles.FailingRecorderDevice
 import com.kayos.healthykayos.doubles.FailingSensorStub
 import com.kayos.healthykayos.doubles.SensorStub
+import com.kayos.healthykayos.doubles.StubRecorderDevice
 import com.kayos.healthykayos.testutils.MainDispatcherRule
 import com.kayos.polar.Device
 import com.kayos.polar.DeviceManager
@@ -32,44 +34,66 @@ class RecordingsViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
-    fun startRecording_setsRecordingState() {
+    fun startRecording_setsRecordingState() = runTest {
+        val deviceManager = DeviceManager()
+        deviceManager.notifyDeviceConnected(StubRecorderDevice())
         val viewModel = RecordingsViewModel(SensorStub(
             heartRate = MutableStateFlow(null)
-        ))
+        ),deviceManager)
 
-        viewModel.startRecording()
+        viewModel.uiState.test{
+            awaitItem()
+            viewModel.startRecording()
 
-        assertEquals(RecordingState.Recording(), viewModel.recordingState.value)
+            assertEquals(RecordingState.Recording(), awaitItem().recordingStatus)
+        }
     }
 
     @Test
-    fun startRecording_whenFails_setsRecordingState() {
-        val viewModel = RecordingsViewModel(FailingSensorStub())
+    fun startRecording_whenFails_setsRecordingState() = runTest{
+        val deviceManager = DeviceManager()
+        deviceManager.notifyDeviceConnected(FailingRecorderDevice())
+        val viewModel = RecordingsViewModel(FailingSensorStub(),deviceManager)
 
-        viewModel.startRecording()
+        viewModel.uiState.test{
+            viewModel.startRecording()
 
-        assertEquals(RecordingState.NotRecording(), viewModel.recordingState.value)
+            assertEquals(RecordingState.NotRecording(), awaitItem().recordingStatus)
+        }
     }
 
     @Test
-    fun stopRecording_setsRecordingState() {
+    fun stopRecording_setsRecordingState() = runTest{
+        val deviceManager = DeviceManager()
+        deviceManager.notifyDeviceConnected(StubRecorderDevice())
         val viewModel = RecordingsViewModel(SensorStub(
             heartRate = MutableStateFlow(null)
-        ))
-        viewModel.startRecording()
+        ), deviceManager)
 
-        viewModel.stopRecording()
+        viewModel.uiState.test{
+            awaitItem()
+            viewModel.startRecording()
 
-        assertEquals(RecordingState.NotRecording(), viewModel.recordingState.value)
+            assertEquals(RecordingState.Recording(), awaitItem().recordingStatus)
+
+            viewModel.stopRecording()
+
+            assertEquals(RecordingState.NotRecording(), awaitItem().recordingStatus)
+        }
     }
 
     @Test
-    fun stopRecording_whenFails_setsRecordingState() {
-        val viewModel = RecordingsViewModel(FailingSensorStub())
+    fun stopRecording_whenFails_setsRecordingState()= runTest{
+        val deviceManager = DeviceManager()
+        deviceManager.notifyDeviceConnected(FailingRecorderDevice())
+        val viewModel = RecordingsViewModel(FailingSensorStub(), deviceManager)
 
-        viewModel.stopRecording()
+        viewModel.uiState.test{
+            awaitItem()
+            viewModel.stopRecording()
 
-        assertEquals(RecordingState.Recording(), viewModel.recordingState.value)
+            assertEquals(RecordingState.Recording(), awaitItem().recordingStatus)
+        }
     }
 
     @Test
