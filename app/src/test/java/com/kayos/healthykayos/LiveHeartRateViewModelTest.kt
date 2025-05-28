@@ -5,7 +5,6 @@ import com.kayos.healthykayos.testutils.MainDispatcherRule
 import com.kayos.polar.Device
 import com.kayos.polar.DeviceManager
 import com.kayos.polar.HeartRate
-import com.kayos.polar.IHeartRateSensor
 import com.kayos.polar.IStreamAPI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -38,7 +37,7 @@ class LiveHeartRateViewModelTest {
         }
         val deviceManager = DeviceManager()
         deviceManager.notifyDeviceConnected(device)
-        val viewModel = LiveHeartRateViewModel(mock<IHeartRateSensor>{},deviceManager)
+        val viewModel = LiveHeartRateViewModel(deviceManager)
 
         viewModel.heartRate.test{
             awaitItem()
@@ -59,7 +58,7 @@ class LiveHeartRateViewModelTest {
         }
         val deviceManager = DeviceManager()
         deviceManager.notifyDeviceConnected(device)
-        val viewModel = LiveHeartRateViewModel(mock<IHeartRateSensor>{},deviceManager)
+        val viewModel = LiveHeartRateViewModel(deviceManager)
 
         viewModel.heartRate.test{
             awaitItem()

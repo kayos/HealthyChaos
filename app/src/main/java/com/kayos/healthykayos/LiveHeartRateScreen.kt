@@ -29,7 +29,7 @@ import java.time.Instant
 
 @Composable
 fun LiveHeartRateScreen(
-    viewModel: LiveHeartRateViewModel = viewModel(factory = LiveHeartRateViewModel.Factory)
+    viewModel: LiveHeartRateViewModel = viewModel()
 ) {
 
     val heartRate by viewModel.heartRate.collectAsStateWithLifecycle()
