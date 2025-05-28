@@ -12,8 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.kayos.healthykayos.ui.theme.KayosTheme
-import com.kayos.polar.HeartRateProviderFactory
-import com.kayos.polar.IHeartRateSensor
+import com.kayos.polar.PolarApiFactory
 import com.polar.sdk.api.PolarBleApiDefaultImpl
 
 class MainActivity : AppCompatActivity() {
@@ -21,10 +20,6 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
         private const val API_LOGGER_TAG = "API LOGGER"
         private const val PERMISSION_REQUEST_CODE = 1
-    }
-
-    private val sensor: IHeartRateSensor by lazy {
-        HeartRateProviderFactory.getPolarHeartRateSensor(applicationContext)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +65,8 @@ class MainActivity : AppCompatActivity() {
 
     public override fun onDestroy() {
         super.onDestroy()
-        sensor.dispose()
+        //TODO: Reassess order of destruction and how to shut down api safely
+        PolarApiFactory.disposeInstance()
     }
 
     private fun showToast(message: String) {

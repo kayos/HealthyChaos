@@ -26,7 +26,7 @@ internal class PolarHeartRateSensor private constructor(
     override val heartRate: StateFlow<HeartRate?> get() = _heartRate
 
     //TODO make private once refactor is done
-    val api: PolarBleApi = PolarApiFactory.getPolarApi(context)
+    val api: PolarBleApi = PolarApiFactory.getInstance(context)
 
     companion object {
         private const val TAG = "PolarHeartRateSensor"

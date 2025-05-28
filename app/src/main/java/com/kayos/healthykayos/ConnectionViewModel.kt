@@ -59,7 +59,7 @@ class ConnectionViewModel(
             initializer {
                 val application = checkNotNull(this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
                 ConnectionViewModel(
-                    _bluetoothAdapter = PolarBluetoothAdapter(PolarApiFactory.getPolarApi(application.applicationContext)),
+                    _bluetoothAdapter = PolarBluetoothAdapter(PolarApiFactory.getInstance(application.applicationContext)),
                 )
             }
         }
