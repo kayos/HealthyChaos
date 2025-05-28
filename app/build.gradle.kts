@@ -47,14 +47,9 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation("com.github.polarofficial:polar-ble-sdk:5.17.0")
-    implementation("io.reactivex.rxjava3:rxjava:3.1.6")
-    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
-    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.7.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
     implementation("androidx.navigation:navigation-compose:2.9.0")
     implementation(project(":data:polar"))
     testImplementation(libs.junit)
@@ -62,6 +57,7 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
     testImplementation("app.cash.turbine:turbine:1.2.0")
     testImplementation("org.robolectric:robolectric:4.14")
+    testImplementation(kotlin("test"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.8")
@@ -91,9 +87,4 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.10.0")
     // Optional - Integration with ViewModels
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
-    // Optional - Integration with LiveData
-    implementation("androidx.compose.runtime:runtime-livedata")
-    // Optional - Integration with RxJava
-    implementation("androidx.compose.runtime:runtime-rxjava2")
-    testImplementation(kotlin("test"))
 }
