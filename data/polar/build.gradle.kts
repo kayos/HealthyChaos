@@ -33,7 +33,7 @@ android {
 }
 
 dependencies {
-
+    implementation(project(":data:device"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

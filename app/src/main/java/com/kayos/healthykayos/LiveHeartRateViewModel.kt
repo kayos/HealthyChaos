@@ -2,9 +2,9 @@ package com.kayos.healthykayos
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kayos.device.HeartRate
+import com.kayos.device.IStreamAPI
 import com.kayos.polar.DeviceManager
-import com.kayos.polar.HeartRate
-import com.kayos.polar.IStreamAPI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

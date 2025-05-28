@@ -1,11 +1,11 @@
 package com.kayos.healthykayos
 
 import app.cash.turbine.test
+import com.kayos.device.HeartRate
+import com.kayos.device.IStreamAPI
 import com.kayos.healthykayos.testutils.MainDispatcherRule
 import com.kayos.polar.Device
 import com.kayos.polar.DeviceManager
-import com.kayos.polar.HeartRate
-import com.kayos.polar.IStreamAPI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest

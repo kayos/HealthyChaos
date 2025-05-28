@@ -1,5 +1,7 @@
 package com.kayos.polar
 
+import com.kayos.device.HeartRate
+import com.kayos.device.IStreamAPI
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
@@ -12,7 +14,7 @@ import java.time.Instant
 class PolarDevice(id: String, name: String, val api: PolarBleApi):
     Device(id, name),
     IRecordingsAPI,
-        IStreamAPI
+    IStreamAPI
 {
 
     override fun listRecordings(): Flow<List<PolarOfflineRecordingEntry>> {

@@ -1,4 +1,4 @@
-package com.kayos.polar
+package com.kayos.device
 
 import java.time.Instant
 

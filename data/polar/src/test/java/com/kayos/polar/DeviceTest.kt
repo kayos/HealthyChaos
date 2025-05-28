@@ -1,5 +1,7 @@
 package com.kayos.polar
 
+import com.kayos.device.HeartRate
+import com.kayos.device.IStreamAPI
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.flow.Flow

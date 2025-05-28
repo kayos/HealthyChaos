@@ -41,6 +41,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":data:polar"))
+    implementation(project(":data:device"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -51,7 +53,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.7.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
     implementation("androidx.navigation:navigation-compose:2.9.0")
-    implementation(project(":data:polar"))
     testImplementation(libs.junit)
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
