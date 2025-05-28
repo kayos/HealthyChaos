@@ -2,13 +2,8 @@ package com.kayos.healthykayos
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kayos.polar.DeviceManager
-import com.kayos.polar.HeartRateProviderFactory
-import com.kayos.polar.IHeartRateSensor
 import com.kayos.polar.IRecordingsAPI
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
@@ -24,7 +19,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx3.await
 import java.io.IOException
 import java.io.Writer
 import java.util.Calendar
@@ -33,7 +27,7 @@ data class RecordingsUiState(
     val recordingStatus: RecordingState,
     val recordings: List<PolarOfflineRecordingEntry>)
 
-class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceManager = DeviceManager.getInstance()) : ViewModel(){
+class RecordingsViewModel(deviceManager: DeviceManager = DeviceManager.getInstance()) : ViewModel(){
     private val _recordingState : MutableStateFlow<RecordingState> = MutableStateFlow(RecordingState.NotRecording())
     private val _refreshRecordings : MutableStateFlow<Int> = MutableStateFlow(0)
     private val _connectedRecorder : StateFlow<IRecordingsAPI?> =
@@ -159,14 +153,6 @@ class RecordingsViewModel(val sensor: IHeartRateSensor, deviceManager: DeviceMan
 
     companion object {
         private const val TAG = "RecordingsViewModel"
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = checkNotNull(this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
-                RecordingsViewModel(
-                    sensor = HeartRateProviderFactory.getPolarHeartRateSensor(application.applicationContext)
-                )
-            }
-        }
     }
 
 }

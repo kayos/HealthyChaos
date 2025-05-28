@@ -38,7 +38,7 @@ import java.io.Writer
 
 @Composable
 fun RecordingsScreen(
-    viewModel: RecordingsViewModel = viewModel(factory = RecordingsViewModel.Factory))
+    viewModel: RecordingsViewModel = viewModel())
 {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
