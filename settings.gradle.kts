@@ -23,3 +23,4 @@ dependencyResolutionManagement {
 rootProject.name = "HealthyKayos"
 include(":app")
 include(":data:polar")
+include(":data:device")
