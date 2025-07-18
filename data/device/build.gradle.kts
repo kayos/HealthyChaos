@@ -14,4 +14,5 @@ kotlin {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.7.3")
+    testImplementation(kotlin("test"))
 }
