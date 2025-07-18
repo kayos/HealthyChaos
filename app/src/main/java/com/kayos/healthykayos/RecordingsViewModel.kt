@@ -3,9 +3,9 @@ package com.kayos.healthykayos
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kayos.device.RecordingData
 import com.kayos.polar.DeviceManager
 import com.kayos.polar.IRecordingsAPI
-import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.Writer
-import java.util.Calendar
 
 data class RecordingsUiState(
     val recordingStatus: RecordingState,
@@ -97,7 +96,7 @@ class RecordingsViewModel(deviceManager: DeviceManager = DeviceManager.getInstan
         viewModelScope.launch(Dispatchers.Main) {
             val data = _connectedRecorder.value?.downloadRecording(recording)
             when (data) {
-                is PolarOfflineRecordingData.HrOfflineRecording -> {
+                is RecordingData.HeartRateRecording -> {
                     saveDataToCSV(data, writer)
                 }
                 else -> {
@@ -108,15 +107,13 @@ class RecordingsViewModel(deviceManager: DeviceManager = DeviceManager.getInstan
     }
 
     // TODO refactor into separate Export class
-    fun saveDataToCSV(data : PolarOfflineRecordingData.HrOfflineRecording, writer: Writer) {
+    fun saveDataToCSV(data : RecordingData.HeartRateRecording, writer: Writer) {
         try {
-            writer.write("time,hr,correctedHr")
+            writer.write("time,bpm")
             writer.write("\n")
 
-            var timestamp = data.startTime
             for (sample in data.data.samples) {
-                timestamp.add(Calendar.SECOND, 1)
-                writer.write("${timestamp.time},${sample.hr},${sample.correctedHr}")
+                writer.write("${sample.secondsFromStart},${sample.bpm}")
                 writer.write("\n")
             }
             writer.flush()
