@@ -109,6 +109,12 @@ class RecordingsViewModel(deviceManager: DeviceManager = DeviceManager.getInstan
     // TODO refactor into separate Export class
     fun saveDataToCSV(data : RecordingData.HeartRateRecording, writer: Writer) {
         try {
+            val duration = data.duration.toComponents { hours, minutes, seconds, _ ->
+                   String.format("%02d:%02d:%02d", hours, minutes, seconds)
+                }
+
+            writer.write("version, date, start time, duration")
+            writer.write("1.0, ${data.startDate},${data.startTime}, $duration")
             writer.write("time,bpm")
             writer.write("\n")
 
