@@ -6,6 +6,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kayos.device.HrData
 import com.kayos.device.RecordingData
+import com.kayos.healthykayos.ActivitySummary
 import com.kayos.healthykayos.HeartRateGraph
 import java.util.Calendar
 
@@ -16,10 +17,13 @@ fun ActivityScreen(recording: RecordingData.HeartRateRecording) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("Activity", style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(16.dp))
+        Text("Summary", style = MaterialTheme.typography.titleMedium)
+        ActivitySummary(recording.data.samples, modifier = Modifier.fillMaxWidth())
         Text("Heart Rate", style = MaterialTheme.typography.titleMedium)
         HeartRateGraph(samples = samples)
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
