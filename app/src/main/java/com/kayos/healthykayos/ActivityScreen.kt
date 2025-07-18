@@ -60,7 +60,7 @@ fun ActivityScreen(recording: RecordingData.HeartRateRecording) {
 
                     for (i in 0 until points.size - 1) {
                         drawLine(
-                            color = Color.Red,
+                            color = getHeartRateZoneColor(samples[i].bpm),
                             start = points[i],
                             end = points[i + 1],
                             strokeWidth = 4f
@@ -88,15 +88,22 @@ fun ActivityScreen(recording: RecordingData.HeartRateRecording) {
     }
 }
 
+fun getHeartRateZoneColor(bpm: Int): Color = when {
+    bpm < 100 -> Color.Blue      // Resting
+    bpm < 120 -> Color.Green     // Fat Burn
+    bpm < 150 -> Color.Yellow    // Cardio
+    else -> Color.Red            // Peak
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun ActivityScreenPreview() {
     val samples = listOf(
         HrData.HrSample(bpm = 80, secondsFromStart = 0),
-        HrData.HrSample(bpm = 85, secondsFromStart = 1),
-        HrData.HrSample(bpm = 90, secondsFromStart = 2),
-        HrData.HrSample(bpm = 88, secondsFromStart = 3)
+        HrData.HrSample(bpm = 115, secondsFromStart = 1),
+        HrData.HrSample(bpm = 190, secondsFromStart = 2),
+        HrData.HrSample(bpm = 140, secondsFromStart = 3)
     )
     val cal = Calendar.getInstance()
 
