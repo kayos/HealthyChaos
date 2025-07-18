@@ -2,6 +2,7 @@ package com.kayos.polar
 
 import com.kayos.device.HeartRate
 import com.kayos.device.IStreamAPI
+import com.kayos.device.RecordingData
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.model.PolarOfflineRecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
@@ -38,8 +39,9 @@ class PolarDevice(id: String, name: String, val api: PolarBleApi):
         api.removeOfflineRecord(id, recording).await()
     }
 
-    override suspend fun downloadRecording(recording: PolarOfflineRecordingEntry): PolarOfflineRecordingData {
-        return api.getOfflineRecord(id, recording).await()
+    override suspend fun downloadRecording(recording: PolarOfflineRecordingEntry): RecordingData {
+        val offlineRecord: PolarOfflineRecordingData = api.getOfflineRecord(id, recording).await()
+        return offlineRecord.convert()
     }
 
     override suspend fun isRecording(): Boolean {
@@ -55,3 +57,4 @@ class PolarDevice(id: String, name: String, val api: PolarBleApi):
             .asFlow()
     }
 }
+

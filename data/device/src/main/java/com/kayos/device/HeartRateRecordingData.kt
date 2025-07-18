@@ -2,10 +2,12 @@ package com.kayos.device
 
 import java.util.Calendar
 
-sealed class RecordingData(
-    val startTime: Calendar){
+sealed class RecordingData(val startTime: Calendar){
 
-    class HeartRateRecording(startTime: Calendar, val data: HrData) :
+     class HeartRateRecording(startTime: Calendar, val data: HrData) :
+        RecordingData(startTime)
+
+     class UnknownRecording(startTime: Calendar) :
         RecordingData(startTime)
 }
 

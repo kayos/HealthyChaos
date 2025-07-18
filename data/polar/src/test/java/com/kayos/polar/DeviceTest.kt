@@ -2,7 +2,7 @@ package com.kayos.polar
 
 import com.kayos.device.HeartRate
 import com.kayos.device.IStreamAPI
-import com.polar.sdk.api.model.PolarOfflineRecordingData
+import com.kayos.device.RecordingData
 import com.polar.sdk.api.model.PolarOfflineRecordingEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -65,7 +65,7 @@ class RecordingDevice : Device("123", "recording"), IRecordingsAPI{
         TODO("Not yet implemented")
     }
 
-    override suspend fun downloadRecording(recording: PolarOfflineRecordingEntry): PolarOfflineRecordingData {
+    override suspend fun downloadRecording(recording: PolarOfflineRecordingEntry): RecordingData {
         TODO("Not yet implemented")
     }
 

@@ -1,5 +1,6 @@
 package com.kayos.healthykayos.doubles
 
+import com.kayos.device.RecordingData
 import com.kayos.polar.Device
 import com.kayos.polar.IRecordingsAPI
 import com.polar.sdk.api.model.PolarOfflineRecordingData
@@ -29,7 +30,7 @@ class FailingRecorderDevice() : Device("123", "Recorder"), IRecordingsAPI {
         TODO("Not yet implemented")
     }
 
-    override suspend fun downloadRecording(recording: PolarOfflineRecordingEntry): PolarOfflineRecordingData {
+    override suspend fun downloadRecording(recording: PolarOfflineRecordingEntry): RecordingData? {
         TODO("Not yet implemented")
     }
 
