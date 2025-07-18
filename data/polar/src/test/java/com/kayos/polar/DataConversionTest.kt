@@ -30,7 +30,7 @@ class DataConversionTest {
 
         val result = unknownRecording.convert()
 
-        assertEquals(startTime, result.startTime)
+        assertEquals(startTime, result.start)
         assert(result is RecordingData.UnknownRecording)
     }
 
@@ -49,7 +49,7 @@ class DataConversionTest {
 
         val result = hrOfflineRecording.convert()
 
-        assertEquals(startTime, result.startTime)
+        assertEquals(startTime, result.start)
         assertEquals(3, result.data.samples.size)
         assertEquals(80, result.data.samples[0].bpm)
         assertEquals(0, result.data.samples[0].secondsFromStart)
@@ -69,7 +69,7 @@ class DataConversionTest {
 
         val result = hrOfflineRecording.convert()
 
-        assertEquals(startTime, result.startTime)
+        assertEquals(startTime, result.start)
         assertEquals(0, result.data.samples.size)
     }
 
@@ -86,7 +86,7 @@ class DataConversionTest {
 
         val result = hrOfflineRecording.convert()
 
-        assertEquals(startTime, result.startTime)
+        assertEquals(startTime, result.start)
         assertEquals(1, result.data.samples.size)
         assertEquals(75, result.data.samples[0].bpm)
         assertEquals(0, result.data.samples[0].secondsFromStart)
